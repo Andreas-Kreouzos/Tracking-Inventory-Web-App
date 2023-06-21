@@ -1,0 +1,14 @@
+pluginManagement {
+    repositories {
+        maven {
+            url = "https://nexus.interamerican.gr/content/repositories/gradle-plugins-releases"
+            credentials {
+                username "$usr"
+                password "$pwd"
+            }
+        }
+    }
+}
+
+rootProject.name = 'tracking-inventory'
+
