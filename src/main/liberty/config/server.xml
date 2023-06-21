@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<server description="new server">
+
+    <!-- Enable features -->
+    <featureManager>
+        <feature>jakartaee-9.1</feature>
+        <feature>microProfile-5.0</feature>
+        <feature>localConnector-1.0</feature>
+    </featureManager>
+
+    <include location="users.xml" optional="true"/>
+
+    <!-- SSL Config -->
+    <ssl id="defaultSSLConfig" trustDefaultCerts="true"/>
+    <include location="GeneratedSSLInclude.xml"/>
+
+    <!-- App Config -->
+    <httpEndpoint
+            host="localhost"
+            httpPort="${default.http.port}"
+            httpsPort="${default.https.port}"
+            id="defaultHttpEndpoint"/>
+    <applicationManager autoExpand="true"/>
+    <webApplication
+            location="openliberty-singlemodule-1.0-SNAPSHOT.war"
+            context-root="root/">
+    </webApplication>
+</server>

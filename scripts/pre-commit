@@ -1,0 +1,39 @@
+#!/bin/sh
+echo "*****Running the pre-commit phase******"
+#The following regular expression will match if it finds:
+#an occurence of the words password, pwd, pass regardless of case
+#preceded and followed by any character(s)
+#followed by = character
+#followed by any number of spaces
+#followed by " or ' character
+#followed by any character except $ character
+
+#examples:
+#uat_pwd = "123456" will match
+#uat_pwd="123456" will match
+#password_uat = "123456" will match
+#PASS= "123456" will match
+#pass= "123456" will match
+#pass= '123456' will match
+#pass= "$123456" will NOT match
+#pass= '$123456' will NOT match
+
+regex='(?i).*(password|pwd|pass).*=\s*(\"|\x27)(?!\$)'
+
+propsRegex='(?i).*(password|pwd|pass).*=\s*(?!\$)'
+
+#The git grep command searches inside the entire repository for any files of the specified types (e.g. .java) that contain a match of the provided regular expression.
+#-n parameter prints the number of the line found
+#-P parameter indicates that the following regular expression will be in Perl flavor
+git grep -n -P "$regex" -- '*.java' '*.groovy' '*.gradle' '*.xml'
+status=$?
+
+git grep -n -P "$propsRegex" -- '*.properties' '*.env'
+status2=$?
+
+#status 0 means that the git grep found matches so we exit the hook with status 1 which means the commit will not be successful
+if [ $status -eq 0 ] || [ $status2 -eq 0 ]
+then
+   echo "*****Passwords detected, commit rejected******"
+   exit 1
+fi

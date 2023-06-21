@@ -1,0 +1,8 @@
+<server>
+    <basicRegistry>
+        <user id="admin" name="admin" password="${user.admin.pwd}"/>
+    </basicRegistry>
+    <administrator-role>
+        <user>admin</user>
+    </administrator-role>
+</server>
