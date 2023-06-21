@@ -1,6 +1,6 @@
-package gr.iag.dgtl.sample.service;
+package gr.iag.dgtl.inventory.service;
 
-import gr.iag.dgtl.sample.dto.Item;
+import gr.iag.dgtl.inventory.dto.Item;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.math.BigDecimal;

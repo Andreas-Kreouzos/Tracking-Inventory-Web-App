@@ -1,4 +1,4 @@
-package gr.iag.dgtl.sample.dto;
+package gr.iag.dgtl.inventory.dto;
 
 import java.math.BigDecimal;
 

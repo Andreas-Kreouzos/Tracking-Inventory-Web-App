@@ -1,6 +1,6 @@
-package gr.iag.dgtl.sample.resource;
+package gr.iag.dgtl.inventory.resource;
 
-import gr.iag.dgtl.sample.dto.Item;
+import gr.iag.dgtl.inventory.dto.Item;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -13,10 +13,10 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
-@Path("/sample")
+@Path("/inventory")
 public class InventoryResource {
 
-    @Operation(summary = "Sample API that returns the value of the sample property in a DTO")
+    @Operation(summary = "Sample API that returns the value of the inventory property in a DTO")
     @APIResponses(value = {
             @APIResponse(responseCode = "200", description = "Success",
                 content = {@Content(mediaType = "application/json",
