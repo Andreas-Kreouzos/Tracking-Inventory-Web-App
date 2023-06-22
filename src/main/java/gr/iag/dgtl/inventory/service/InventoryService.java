@@ -3,21 +3,23 @@ package gr.iag.dgtl.inventory.service;
 import gr.iag.dgtl.inventory.dto.Item;
 import jakarta.enterprise.context.ApplicationScoped;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
 public class InventoryService implements IInventoryService {
 
+    private final List<Item> items = new ArrayList<>();
+
     @Override
     public List<Item> getItems() {
-        return null;
+        return new ArrayList<>(items);
     }
 
     @Override
-    public void addItem(String name, String serialNumber, BigDecimal value) {
-
+    public void addItem(Item item) {
+        items.add(item);
     }
 
     @Override
