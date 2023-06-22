@@ -19,11 +19,9 @@ public interface IInventoryService {
 
     /**
      * Adds an Item into inventory
-     * @param name the name of the Item
-     * @param serialNumber the serial number of the Item
-     * @param value the value in $ of the Item
+     * @param item the item itself
      */
-    void addItem(String name, String serialNumber, BigDecimal value);
+    void addItem(Item item);
 
     /**
      * Gets an Item from the inventory by using the serial number
