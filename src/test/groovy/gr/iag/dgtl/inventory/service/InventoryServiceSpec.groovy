@@ -20,7 +20,7 @@ class InventoryServiceSpec extends Specification {
         when: 'calling the service'
         service.addItem(item)
 
-        then: ''
+        then: 'the item is added to the service'
         def items = service.getItems()
         items.size() == 1
         items.get(0).name() == item.name()
