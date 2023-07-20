@@ -61,6 +61,7 @@ dependencies {
     testImplementation 'org.apache.groovy:groovy-all:4.0.6'
     testImplementation 'org.spockframework:spock-core:2.3-groovy-4.0'
     testImplementation 'net.bytebuddy:byte-buddy:1.12.13'
+    testImplementation 'org.eclipse:yasson:3.0.2'
 
     /* Logging */
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.2'
