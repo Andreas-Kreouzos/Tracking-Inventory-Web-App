@@ -2,7 +2,6 @@ package gr.iag.dgtl.inventory.service;
 
 import gr.iag.dgtl.inventory.dto.Item;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
