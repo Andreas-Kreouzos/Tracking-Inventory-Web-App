@@ -33,7 +33,7 @@ public class InventoryService implements IInventoryService {
     @Override
     public Optional<Item> getItemBySerialNumber(String serialNumber) {
         return items.stream()
-                .filter(item -> item.serialNumber().equals(serialNumber))
+                .filter(item -> item.getSerialNumber().equals(serialNumber))
                 .findFirst();
     }
 

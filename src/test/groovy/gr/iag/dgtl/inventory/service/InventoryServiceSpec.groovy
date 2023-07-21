@@ -37,9 +37,9 @@ class InventoryServiceSpec extends Specification {
         then: 'the item is indeed being added'
         def items = service.getItems()
         items.size() == 1
-        items.get(0).name() == item.name()
-        items.get(0).serialNumber() == item.serialNumber()
-        items.get(0).value() == item.value()
+        items.get(0).name == item.name
+        items.get(0).serialNumber == item.serialNumber
+        items.get(0).value == item.value
     }
 
     def 'Successfully delete an item from the list'() {
@@ -51,7 +51,7 @@ class InventoryServiceSpec extends Specification {
         itemPersistence.saveItems(_) >> { args -> args[0] }
 
         when: 'trying to delete the item from the list'
-        service.deleteItem(item.serialNumber())
+        service.deleteItem(item.serialNumber)
 
         then: 'the item is indeed being removed'
         service.getItems().isEmpty()

@@ -40,12 +40,12 @@ class JsonItemPersistenceSpec extends Specification {
 
         and: 'the loaded items are the same as the saved items'
         loadedItems.size() == 2
-        loadedItems[0].name() == 'Item1'
-        loadedItems[0].serialNumber() == '123'
-        loadedItems[0].value() == 50 as BigDecimal
-        loadedItems[1].name() == 'Item2'
-        loadedItems[1].serialNumber() == '456'
-        loadedItems[1].value() == 100 as BigDecimal
+        loadedItems[0].name == 'Item1'
+        loadedItems[0].serialNumber == '123'
+        loadedItems[0].value == 50 as BigDecimal
+        loadedItems[1].name == 'Item2'
+        loadedItems[1].serialNumber == '456'
+        loadedItems[1].value == 100 as BigDecimal
     }
 
     def 'Should handle empty list correctly'() {
