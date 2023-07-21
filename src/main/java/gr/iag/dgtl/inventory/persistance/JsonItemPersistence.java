@@ -20,10 +20,11 @@ import java.util.List;
  */
 public class JsonItemPersistence implements IItemPersistence {
 
-    private static final String DATA_FILE = "inventory.json";
+    private static String DATA_FILE;
     private final Jsonb jsonb;
 
-    public JsonItemPersistence() {
+    public JsonItemPersistence(String dataFile) {
+        DATA_FILE = dataFile;
         JsonbConfig config = new JsonbConfig().withFormatting(true);
         this.jsonb = JsonbBuilder.create(config);
     }
