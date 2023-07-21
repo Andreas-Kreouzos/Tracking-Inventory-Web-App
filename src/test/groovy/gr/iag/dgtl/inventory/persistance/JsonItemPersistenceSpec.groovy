@@ -69,4 +69,36 @@ class JsonItemPersistenceSpec extends Specification {
         then: 'an empty list is returned'
         loadedItems.isEmpty()
     }
+
+    def 'Should handle null list correctly'() {
+        given: 'an empty list of items'
+        List<Item> nullList = [null]
+
+        when: 'we save the empty list'
+        persistence.saveItems(nullList)
+
+        then: 'a file is created'
+        thrown(NullPointerException)
+    }
+
+    def 'Should handle file write error correctly'() {
+        given: 'a list of items'
+        List<Item> items = [
+                new Item('Item1', '123', 50 as BigDecimal),
+                new Item('Item2', '456', 100 as BigDecimal)
+        ]
+
+        and: 'the file is read-only'
+        File file = new File(tempDir.toString(), 'test.json')
+        file.createNewFile()
+        file.setReadOnly()
+
+        when: 'we save the list'
+        persistence.saveItems(items)
+
+        then: 'an exception is thrown'
+        def exception = thrown(RuntimeException)
+        exception.message.contains('Failed to save items to file')
+    }
+
 }

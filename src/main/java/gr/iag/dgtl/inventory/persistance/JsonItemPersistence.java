@@ -52,10 +52,19 @@ public class JsonItemPersistence implements IItemPersistence {
      */
     @Override
     public void saveItems(List<Item> items) {
+        checkNullItems(items);
         try (FileWriter writer = new FileWriter(DATA_FILE)) {
             jsonb.toJson(items, writer);
         } catch (IOException e) {
             throw new RuntimeException("Failed to save items to file", e);
+        }
+    }
+
+    private void checkNullItems(List<Item> items) {
+        for (Item item : items) {
+            if (item == null) {
+                throw new NullPointerException("Cannot save null item");
+            }
         }
     }
 }
