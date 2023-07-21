@@ -47,4 +47,26 @@ class JsonItemPersistenceSpec extends Specification {
         loadedItems[1].serialNumber() == '456'
         loadedItems[1].value() == 100 as BigDecimal
     }
+
+    def 'Should handle empty list correctly'() {
+        given: 'an empty list of items'
+        List<Item> emptyList = []
+
+        when: 'we save the empty list'
+        persistence.saveItems(emptyList)
+
+        then: 'a file is created'
+        Path filePath = Paths.get(tempDir.toString(), 'test.json')
+        Files.exists(filePath)
+
+        and: 'the file contains an empty JSON array'
+        String fileContents = new String(Files.readAllBytes(filePath))
+        fileContents.replaceAll("\\s", "") == '[]'
+
+        when: 'we load items from the empty file'
+        List<Item> loadedItems = persistence.loadItems()
+
+        then: 'an empty list is returned'
+        loadedItems.isEmpty()
+    }
 }
