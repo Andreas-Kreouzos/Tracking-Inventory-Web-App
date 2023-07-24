@@ -16,44 +16,32 @@ class InventoryServiceSpec extends Specification {
         service = new InventoryService(itemPersistence)
     }
 
-    def cleanup() {
-        File file = new File('inventory.json')
-        if (file.exists()) {
-            file.delete()
-        }
-    }
-
-    def 'Successfully insert an item into list'() {
+    def 'Adding an Item, saves it with correct fields'() {
         given: 'an item'
         def item = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
 
-        and: 'persistence returns empty list initially and then adds the item'
-        itemPersistence.loadItems() >> []
-        itemPersistence.saveItems(_) >> { args -> args[0] }
-
-        when: 'trying to add the item in the list'
+        when: 'calling the method to add the item in a list'
         service.addItem(item)
 
-        then: 'the item is indeed being added'
-        def items = service.getItems()
-        items.size() == 1
-        items.get(0).name == item.name
-        items.get(0).serialNumber == item.serialNumber
-        items.get(0).value == item.value
+        then: 'it gets saved in this list'
+        1 * itemPersistence.saveItems([item])
     }
 
-    def 'Successfully delete an item from the list'() {
+    def 'Successfully deleting an Item'() {
         given: 'an item'
         def item = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
 
-        and: 'persistence initially returns list with item and then removes the item'
+        and: 'the item is in the inventory'
         itemPersistence.loadItems() >> [item]
-        itemPersistence.saveItems(_) >> { args -> args[0] }
 
-        when: 'trying to delete the item from the list'
+        when: 'the item is added'
+        service.addItem(item)
+
+        and: 'calling the method to delete the item from the list'
         service.deleteItem(item.serialNumber)
 
-        then: 'the item is indeed being removed'
-        service.getItems().isEmpty()
+        then: 'an empty list gets saved'
+        1 * itemPersistence.saveItems([])
     }
+
 }

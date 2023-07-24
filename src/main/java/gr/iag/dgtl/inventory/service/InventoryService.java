@@ -32,14 +32,18 @@ public class InventoryService implements IInventoryService {
 
     @Override
     public Optional<Item> getItemBySerialNumber(String serialNumber) {
-        return items.stream()
-                .filter(item -> item.getSerialNumber().equals(serialNumber))
-                .findFirst();
+        for (Item item : items) {
+            if (item.getSerialNumber().equals(serialNumber)) {
+                return Optional.of(item);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
     public void deleteItem(String serialNumber) {
-        getItemBySerialNumber(serialNumber).ifPresent(item -> {
+        Optional<Item> optionalItem = getItemBySerialNumber(serialNumber);
+        optionalItem.ifPresent(item -> {
             items.remove(item);
             itemPersistence.saveItems(items);
         });
