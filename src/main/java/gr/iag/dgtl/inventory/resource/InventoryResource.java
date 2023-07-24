@@ -42,7 +42,6 @@ public class InventoryResource {
                 schema = @Schema(implementation = Item.class, type = SchemaType.ARRAY))})
     })
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public Response getItems(){
         return null;
     }
