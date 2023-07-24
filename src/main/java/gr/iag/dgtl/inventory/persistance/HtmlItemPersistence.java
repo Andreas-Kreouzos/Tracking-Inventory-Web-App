@@ -7,6 +7,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -48,6 +49,8 @@ public class HtmlItemPersistence implements IItemPersistence {
 
                 items.add(new Item(name, serialNumber, value));
             }
+        } catch (FileNotFoundException e) {
+            return items;
         } catch (IOException e) {
             throw new RuntimeException("Failed to load items from HTML file", e);
         }
