@@ -55,14 +55,26 @@ class HtmlItemPersistenceSpec extends Specification {
         when: 'we save the empty list'
         persistence.saveItems(emptyList)
 
-        then: 'a file is created'
+        then: 'a HTML file is created'
         Path filePath = Paths.get(tempDir.toString(), 'test.html')
         Files.exists(filePath)
 
-        when: 'we load items from the empty file'
+        when: 'we load items from the empty list'
         List<Item> loadedItems = persistence.loadItems()
 
         then: 'an empty list is returned'
         loadedItems.isEmpty()
+    }
+
+    def 'Should handle null list correctly'() {
+        given: 'a list containing null'
+        List<Item> nullList = [null]
+
+        when: 'we save the list'
+        persistence.saveItems(nullList)
+
+        then: 'an exception is thrown'
+        def exception = thrown(NullPointerException)
+        exception.message.contains('Cannot save null item')
     }
 }

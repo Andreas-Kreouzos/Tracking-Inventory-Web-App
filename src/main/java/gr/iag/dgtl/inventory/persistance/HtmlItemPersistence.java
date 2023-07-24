@@ -63,6 +63,10 @@ public class HtmlItemPersistence implements IItemPersistence {
                 "<tr><th>Name</th><th>Serial Number</th><th>Value</th></tr>\n");
 
         for (Item item : items) {
+            if(item == null) {
+                throw new NullPointerException("Cannot save null item");
+            }
+
             htmlContent.append("<tr><td>")
                     .append(item.getName())
                     .append("</td><td>")
