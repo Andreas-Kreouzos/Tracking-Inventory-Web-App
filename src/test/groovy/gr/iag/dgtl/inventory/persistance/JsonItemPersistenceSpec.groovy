@@ -1,6 +1,7 @@
 package gr.iag.dgtl.inventory.persistance
 
 import gr.iag.dgtl.inventory.dto.Item
+import jakarta.json.bind.JsonbException
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.TempDir
@@ -99,6 +100,31 @@ class JsonItemPersistenceSpec extends Specification {
         then: 'an exception is thrown'
         def exception = thrown(RuntimeException)
         exception.message.contains('Failed to save items to file')
+    }
+
+    def 'Should handle non-existent file correctly'() {
+        given: 'a non-existent file path'
+        persistence = new JsonItemPersistence(tempDir.toString() + "/non_existent_file.json")
+
+        when: 'we load items from the non-existent file'
+        def loadedItems = persistence.loadItems()
+
+        then: 'an empty list is returned'
+        loadedItems.isEmpty()
+    }
+
+    def 'Should handle invalid file format correctly'() {
+        given: 'a file with invalid format'
+        Path filePath = Paths.get(tempDir.toString(), 'test.json')
+        Files.write(filePath, 'This is not valid JSON'.bytes)
+
+        when: 'we load items from the file'
+        persistence = new JsonItemPersistence(filePath.toString())
+        persistence.loadItems()
+
+        then: 'an appropriate exception is thrown'
+        def exception = thrown(JsonbException)
+        exception.message.contains('Unexpected char')
     }
 
 }
