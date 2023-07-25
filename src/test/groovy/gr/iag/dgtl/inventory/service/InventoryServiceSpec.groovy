@@ -44,4 +44,59 @@ class InventoryServiceSpec extends Specification {
         1 * itemPersistence.saveItems([])
     }
 
+    def 'getItemBySerialNumber correctly fetches an item'() {
+        given: 'an item'
+        def item = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
+
+        and: 'the item is in the inventory'
+        itemPersistence.loadItems() >> [item]
+        service = new InventoryService(itemPersistence)
+
+        expect: 'getItemBySerialNumber returns the correct item'
+        service.getItemBySerialNumber(item.serialNumber).get() == item
+    }
+
+    def 'getItemBySerialNumber returns empty if item is not in inventory'() {
+        given: 'an item serial number'
+        String serialNumber = 'non-existent serial number'
+
+        and: 'the inventory is empty'
+        itemPersistence.loadItems() >> []
+
+        expect: 'getItemBySerialNumber returns empty'
+        !service.getItemBySerialNumber(serialNumber).isPresent()
+    }
+
+    def 'getItems returns all items in inventory'() {
+        given: 'several items in the inventory'
+        def item1 = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
+        def item2 = new Item('Playstation 5','PS1234XYZ', 499 as BigDecimal)
+        itemPersistence.loadItems() >> [item1, item2]
+        service = new InventoryService(itemPersistence)
+
+        expect: 'getItems returns all items'
+        service.getItems() == [item1, item2]
+    }
+
+    def 'getItems returns an empty list if the inventory is empty'() {
+        given: 'an empty inventory'
+        itemPersistence.loadItems() >> []
+
+        expect: 'getItems returns an empty list'
+        service.getItems().isEmpty()
+    }
+
+    def 'InventoryService properly handles exception thrown by IItemPersistence'() {
+        given: 'an item'
+        def item = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
+
+        and: 'IItemPersistence throws an exception when trying to save items'
+        itemPersistence.saveItems(_) >> { throw new RuntimeException('Test exception') }
+
+        when: 'addItem is called'
+        service.addItem(item)
+
+        then: 'a RuntimeException is thrown'
+        thrown(RuntimeException)
+    }
 }
