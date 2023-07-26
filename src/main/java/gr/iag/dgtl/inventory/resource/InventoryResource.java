@@ -6,19 +6,17 @@ import gr.iag.dgtl.inventory.service.IInventoryService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
-import org.eclipse.microprofile.openapi.annotations.media.Content;
-import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+
+import java.util.Optional;
 
 /**
  * Contains the API for creating a request to create a Json file.
@@ -35,17 +33,6 @@ public class InventoryResource {
         this.service = service;
     }
 
-    @Operation(summary = "Sample API that returns the value of the inventory property in a DTO")
-    @APIResponses(value = {
-            @APIResponse(responseCode = "200", description = "Success",
-                content = {@Content(mediaType = "application/json",
-                schema = @Schema(implementation = Item.class, type = SchemaType.ARRAY))})
-    })
-    @GET
-    public Response getItems(){
-        return null;
-    }
-
     @POST
     public Response create(@RequestBody @Valid Item request) {
         service.addItem(request);
@@ -54,5 +41,28 @@ public class InventoryResource {
         itemResponse.setMessage("Item created successfully");
         itemResponse.setItemId(request.getSerialNumber());
         return Response.ok(itemResponse).build();
+    }
+
+    @GET
+    @Path("/{serialNumber}")
+    public Response getItemBySerialNumber(@PathParam("serialNumber") String serialNumber) {
+        Optional<Item> item = service.getItemBySerialNumber(serialNumber);
+        if (item.isPresent()) {
+            return Response.ok(item.get()).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+    }
+
+    @Path("{serialNumber}")
+    @DELETE
+    public Response delete(@PathParam("serialNumber") String serialNumber) {
+        Optional<Item> item = service.getItemBySerialNumber(serialNumber);
+        if (item.isPresent()) {
+            service.deleteItem(serialNumber);
+            return Response.ok().build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 }
