@@ -60,7 +60,7 @@ public class InventoryResource {
         Optional<Item> item = service.getItemBySerialNumber(serialNumber);
         if (item.isPresent()) {
             service.deleteItem(serialNumber);
-            return Response.ok().build();
+            return Response.noContent().build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }

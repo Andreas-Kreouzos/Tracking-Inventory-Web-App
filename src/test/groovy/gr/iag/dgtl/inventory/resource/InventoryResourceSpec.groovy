@@ -56,6 +56,7 @@ class InventoryResourceSpec extends ResourceSpecification {
     def 'Successful delete item request'() {
         given: 'a valid item'
         def item = createItem()
+        service.getItemBySerialNumber(item.serialNumber) >> Optional.of(item)
 
         when: 'trying to delete the item'
         def response = jerseyDelete(item.serialNumber)
@@ -64,6 +65,7 @@ class InventoryResourceSpec extends ResourceSpecification {
         1 * service.deleteItem(item.serialNumber)
         response.status == Response.Status.NO_CONTENT.statusCode
     }
+
 
     def 'Item not found'() {
         given: 'a non-existing serialNumber'
