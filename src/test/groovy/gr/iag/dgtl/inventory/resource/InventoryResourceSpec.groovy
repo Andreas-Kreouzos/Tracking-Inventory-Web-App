@@ -2,8 +2,8 @@ package gr.iag.dgtl.inventory.resource
 
 import gr.iag.dgtl.inventory.ResourceSpecification
 import gr.iag.dgtl.inventory.dto.Item
+import gr.iag.dgtl.inventory.exception.InventoryException
 import gr.iag.dgtl.inventory.service.IInventoryService
-import gr.iag.dgtl.ip.commons.exception.IPRuntimeException
 import groovy.json.JsonSlurper
 import jakarta.ws.rs.client.Entity
 import jakarta.ws.rs.core.Response
@@ -49,7 +49,7 @@ class InventoryResourceSpec extends ResourceSpecification {
         def response = jerseyPost(jsonReq)
 
         then: 'the service is called and throws an exception'
-        1 * service.addItem(_) >> { throw new IPRuntimeException(errMsg) }
+        1 * service.addItem(_) >> { throw new InventoryException(errMsg) }
 
         and: 'the response is 500 with the error message we await'
         response.status == Response.Status.INTERNAL_SERVER_ERROR.statusCode

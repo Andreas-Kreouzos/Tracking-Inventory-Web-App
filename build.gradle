@@ -53,8 +53,6 @@ test {
 }
 
 dependencies {
-    implementation 'gr.iag.dgtl.ip:integration-platform-commons:1.0.1b7-SNAPSHOT'
-
     /* Microprofile Core */
     providedCompile 'jakarta.platform:jakarta.jakartaee-api:9.1.0'
     providedCompile 'org.eclipse.microprofile:microprofile:5.0'

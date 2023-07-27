@@ -1,7 +1,6 @@
 package gr.iag.dgtl.inventory
 
-import gr.iag.dgtl.ip.commons.exception.IPRuntimeException
-import gr.iag.dgtl.ip.commons.mapper.IPRuntimeExceptionMapper
+import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper
 import jakarta.json.bind.Jsonb
 import jakarta.json.bind.JsonbBuilder
 import jakarta.ws.rs.core.Application
@@ -21,7 +20,7 @@ abstract class ResourceSpecification extends Specification {
             protected Application configure() {
                 new ResourceConfig()
                         .register(createResource())
-                        .register(IPRuntimeExceptionMapper)
+                        .register(InventoryExceptionMapper)
             }
         }
         jerseyTest.setUp()
