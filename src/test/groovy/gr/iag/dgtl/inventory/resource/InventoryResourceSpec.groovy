@@ -1,6 +1,7 @@
 package gr.iag.dgtl.inventory.resource
 
 import gr.iag.dgtl.inventory.ResourceSpecification
+import gr.iag.dgtl.inventory.TestItemProvider
 import gr.iag.dgtl.inventory.dto.Item
 import gr.iag.dgtl.inventory.exception.InventoryException
 import gr.iag.dgtl.inventory.service.IInventoryService
@@ -8,6 +9,7 @@ import groovy.json.JsonSlurper
 import jakarta.ws.rs.client.Entity
 import jakarta.ws.rs.core.Response
 import spock.lang.Shared
+import spock.lang.Unroll
 
 class InventoryResourceSpec extends ResourceSpecification {
 
@@ -24,7 +26,7 @@ class InventoryResourceSpec extends ResourceSpecification {
 
     def 'Successful item creation request'() {
         given: 'a valid item request'
-        def jsonReq = jsonb.toJson(createItem())
+        def jsonReq = jsonb.toJson(TestItemProvider.createItem())
 
         when: 'calling the create method of the resource'
         def response = jerseyPost(jsonReq)
@@ -40,7 +42,7 @@ class InventoryResourceSpec extends ResourceSpecification {
 
     def '500 response with a related message if a RuntimeException occurs'() {
         given: 'a valid create claim request'
-        def jsonReq = jsonb.toJson(createItem())
+        def jsonReq = jsonb.toJson(TestItemProvider.createItem())
 
         and: 'the error data'
         def errMsg = 'An exception happened'
@@ -55,6 +57,27 @@ class InventoryResourceSpec extends ResourceSpecification {
         response.status == Response.Status.INTERNAL_SERVER_ERROR.statusCode
         def jsonResponse = new JsonSlurper().parseText(response.readEntity(String))
         jsonResponse.errors == [errMsg]
+    }
+
+    @Unroll
+    def '400 response for a request when creating an Item Request with invalid parameters'() {
+        given: 'a request with invalid data'
+        def jsonReq = jsonb.toJson(invalidItemRequest)
+
+        when: ' the API is called with invalid input'
+        def response = jerseyPost(jsonReq)
+
+        then: 'the service is not called'
+        0 * _
+
+        and: ' the response is 400 and contains a message for the invalid fields'
+        response.status == Response.Status.BAD_REQUEST.statusCode
+        def jsonResponse = new JsonSlurper().parseText(response.readEntity(String))
+        jsonResponse.errors == errors
+
+        where:
+        invalidItemRequest                                              || errors
+        TestItemProvider.createItemWithNullName()                       || TestItemProvider.invalidItemName()
     }
 
     def 'Successful get item request'() {
@@ -109,11 +132,6 @@ class InventoryResourceSpec extends ResourceSpecification {
 
         then: 'the item is not found'
         response.status == Response.Status.NOT_FOUND.statusCode
-    }
-
-
-    def createItem() {
-        new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
     }
 
     private Response jerseyPost(String jsonReq) {

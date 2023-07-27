@@ -1,5 +1,6 @@
 package gr.iag.dgtl.inventory
 
+import gr.iag.dgtl.inventory.mapper.ConstraintViolationExceptionMapper
 import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper
 import jakarta.json.bind.Jsonb
 import jakarta.json.bind.JsonbBuilder
@@ -20,6 +21,7 @@ abstract class ResourceSpecification extends Specification {
             protected Application configure() {
                 new ResourceConfig()
                         .register(createResource())
+                        .register(ConstraintViolationExceptionMapper)
                         .register(InventoryExceptionMapper)
             }
         }
