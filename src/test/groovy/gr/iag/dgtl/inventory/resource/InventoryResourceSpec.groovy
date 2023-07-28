@@ -113,7 +113,7 @@ class InventoryResourceSpec extends ResourceSpecification {
         response.status == Response.Status.NO_CONTENT.statusCode
     }
 
-    def 'the POST service does not interfere with thrown exceptions'() {
+    def 'the GET service does not interfere with thrown exceptions'() {
         given: 'a valid item'
         def item = TestItemProvider.createItem()
 
@@ -126,7 +126,7 @@ class InventoryResourceSpec extends ResourceSpecification {
             throw new InventoryException(errorMsg, cause)
         }
 
-        when: 'the POST service handles a request'
+        when: 'the GET service handles a request'
         def response = jerseyGet(item.serialNumber, BASE_URL)
 
         then: 'a 500 response is received'
