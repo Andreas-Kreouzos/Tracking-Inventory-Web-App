@@ -45,24 +45,18 @@ public class InventoryResource {
 
     @GET
     @Path("/{serialNumber}")
-    public Response getItemBySerialNumber(@PathParam("serialNumber") String serialNumber) {
+    public Response getItemBySerialNumber(
+            @PathParam("serialNumber") String serialNumber) {
         Optional<Item> item = service.getItemBySerialNumber(serialNumber);
-        if (item.isPresent()) {
-            return Response.ok(item.get()).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        return Response.ok(item.get()).build();
     }
 
-    @Path("{serialNumber}")
     @DELETE
-    public Response delete(@PathParam("serialNumber") String serialNumber) {
-        Optional<Item> item = service.getItemBySerialNumber(serialNumber);
-        if (item.isPresent()) {
-            service.deleteItem(serialNumber);
-            return Response.noContent().build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+    @Path("{serialNumber}")
+    public Response delete(
+            @PathParam("serialNumber") String serialNumber) {
+        service.getItemBySerialNumber(serialNumber);
+        service.deleteItem(serialNumber);
+        return Response.noContent().build();
     }
 }

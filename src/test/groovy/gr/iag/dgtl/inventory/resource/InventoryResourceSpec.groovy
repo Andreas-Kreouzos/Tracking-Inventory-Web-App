@@ -2,10 +2,10 @@ package gr.iag.dgtl.inventory.resource
 
 import gr.iag.dgtl.inventory.ResourceSpecification
 import gr.iag.dgtl.inventory.TestItemProvider
+import gr.iag.dgtl.inventory.dto.ErrorResponse
 import gr.iag.dgtl.inventory.exception.InventoryException
 import gr.iag.dgtl.inventory.service.IInventoryService
 import groovy.json.JsonSlurper
-import jakarta.ws.rs.client.Entity
 import jakarta.ws.rs.core.Response
 import spock.lang.Shared
 import spock.lang.Unroll
@@ -28,7 +28,7 @@ class InventoryResourceSpec extends ResourceSpecification {
         def jsonReq = jsonb.toJson(TestItemProvider.createItem())
 
         when: 'calling the create method of the resource'
-        def response = jerseyPost(jsonReq)
+        def response = jerseyPost(jsonReq, BASE_URL)
 
         then: 'the response is OK'
         1 * service.addItem(_)
@@ -47,7 +47,7 @@ class InventoryResourceSpec extends ResourceSpecification {
         def errMsg = 'An exception happened'
 
         when: 'the API is called with valid input'
-        def response = jerseyPost(jsonReq)
+        def response = jerseyPost(jsonReq, BASE_URL)
 
         then: 'the service is called and throws an exception'
         1 * service.addItem(_) >> { throw new InventoryException(errMsg) }
@@ -64,7 +64,7 @@ class InventoryResourceSpec extends ResourceSpecification {
         def jsonReq = jsonb.toJson(invalidItemRequest)
 
         when: ' the API is called with invalid input'
-        def response = jerseyPost(jsonReq)
+        def response = jerseyPost(jsonReq, BASE_URL)
 
         then: 'the service is not called'
         0 * _
@@ -86,11 +86,11 @@ class InventoryResourceSpec extends ResourceSpecification {
 
     def 'Successful get item request'() {
         given: 'a valid item'
-        def item = createItem()
+        def item = TestItemProvider.createItem()
         service.getItemBySerialNumber(item.serialNumber) >> Optional.of(item)
 
         when: 'trying to get the item'
-        def response = jerseyGet(item.serialNumber)
+        def response = jerseyGet(item.serialNumber, BASE_URL)
 
         then: 'the response is OK and returns the item'
         response.status == Response.Status.OK.statusCode
@@ -102,60 +102,36 @@ class InventoryResourceSpec extends ResourceSpecification {
 
     def 'Successful delete item request'() {
         given: 'a valid item'
-        def item = createItem()
+        def item = TestItemProvider.createItem()
         service.getItemBySerialNumber(item.serialNumber) >> Optional.of(item)
 
         when: 'trying to delete the item'
-        def response = jerseyDelete(item.serialNumber)
+        def response = jerseyDelete(item.serialNumber, BASE_URL)
 
         then: 'the response is No Content'
         1 * service.deleteItem(item.serialNumber)
         response.status == Response.Status.NO_CONTENT.statusCode
     }
 
+    def 'the POST service does not interfere with thrown exceptions'() {
+        given: 'a valid item'
+        def item = TestItemProvider.createItem()
 
-    def 'Item not found'() {
-        given: 'a non-existing serialNumber'
-        String serialNumber = 'NONEXISTENT'
-        service.getItemBySerialNumber(serialNumber) >> Optional.empty()
+        and: 'some error parameters'
+        def cause = new Exception()
+        def errorMsg = 'a message'
 
-        when: 'trying to get the item'
-        def response = jerseyGet(serialNumber)
+        and: 'the service throws an exception'
+        1 * service.getItemBySerialNumber(item.serialNumber) >> {
+            throw new InventoryException(errorMsg, cause)
+        }
 
-        then: 'the item is not found'
-        response.status == Response.Status.NOT_FOUND.statusCode
+        when: 'the POST service handles a request'
+        def response = jerseyGet(item.serialNumber, BASE_URL)
+
+        then: 'a 500 response is received'
+        response.status == Response.Status.INTERNAL_SERVER_ERROR.statusCode
+        response.readEntity(ErrorResponse.class).errors.size() == 1
     }
 
-    def 'Unsuccessful delete item request'() {
-        given: 'a non-existing serialNumber'
-        String serialNumber = 'NONEXISTENT'
-        service.getItemBySerialNumber(serialNumber) >> Optional.empty()
-
-        when: 'trying to delete the item'
-        def response = jerseyDelete(serialNumber)
-
-        then: 'the item is not found'
-        response.status == Response.Status.NOT_FOUND.statusCode
-    }
-
-    private Response jerseyPost(String jsonReq) {
-        jerseyTest
-                .target(BASE_URL)
-                .request()
-                .post(Entity.json(jsonReq))
-    }
-
-    private Response jerseyGet(String serialNumber) {
-        jerseyTest
-                .target(BASE_URL + "/" + serialNumber)
-                .request()
-                .get()
-    }
-
-    private Response jerseyDelete(String serialNumber) {
-        jerseyTest
-                .target(BASE_URL + "/" + serialNumber)
-                .request()
-                .delete()
-    }
 }
