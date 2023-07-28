@@ -2,7 +2,6 @@ package gr.iag.dgtl.inventory.resource
 
 import gr.iag.dgtl.inventory.ResourceSpecification
 import gr.iag.dgtl.inventory.TestItemProvider
-import gr.iag.dgtl.inventory.dto.Item
 import gr.iag.dgtl.inventory.exception.InventoryException
 import gr.iag.dgtl.inventory.service.IInventoryService
 import groovy.json.JsonSlurper
@@ -78,6 +77,11 @@ class InventoryResourceSpec extends ResourceSpecification {
         where:
         invalidItemRequest                                              || errors
         TestItemProvider.createItemWithNullName()                       || TestItemProvider.invalidItemName()
+        TestItemProvider.createItemWithEmptyName()                      || TestItemProvider.invalidItemName()
+        TestItemProvider.createItemWithNullSerialNumber()               || TestItemProvider.invalidItemSerialNumber()
+        TestItemProvider.createItemWithEmptySerialNumber()              || TestItemProvider.invalidItemSerialNumber()
+        TestItemProvider.createItemWithNullValue()                      || TestItemProvider.invalidItemValue()
+        TestItemProvider.createItemWithLessThanMinValue()               || TestItemProvider.invalidItemMinValue()
     }
 
     def 'Successful get item request'() {
