@@ -1,6 +1,9 @@
 package gr.iag.dgtl.inventory.service
 
+import gr.iag.dgtl.inventory.TestItemProvider
 import gr.iag.dgtl.inventory.dto.Item
+import gr.iag.dgtl.inventory.exception.InventoryException
+import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper
 import gr.iag.dgtl.inventory.persistance.IItemPersistence
 import spock.lang.Specification
 import spock.lang.Subject
@@ -11,15 +14,14 @@ class InventoryServiceSpec extends Specification {
     InventoryService service
     IItemPersistence itemPersistence
 
+    def item = TestItemProvider.createItem()
+
     def setup() {
         itemPersistence = Mock(IItemPersistence)
         service = new InventoryService(itemPersistence)
     }
 
-    def 'Adding an Item, saves it with correct fields'() {
-        given: 'an item'
-        def item = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
-
+    def 'Successfully adding an item with correct fields'() {
         when: 'calling the method to add the item in a list'
         service.addItem(item)
 
@@ -27,11 +29,27 @@ class InventoryServiceSpec extends Specification {
         1 * itemPersistence.saveItems([item])
     }
 
-    def 'Successfully deleting an Item'() {
-        given: 'an item'
-        def item = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
+    def 'Persistence throws exception when trying to save an item'() {
+        given: 'some error parameters'
+        def errorMsg = 'An exception happened'
+        def cause = new RuntimeException()
 
-        and: 'the item is in the inventory'
+        when: 'calling the method to add the item in a list'
+        service.addItem(item)
+
+        then: 'the persistence will throw an exception'
+        1 * itemPersistence.saveItems(_) >> {
+            throw new InventoryException(errorMsg, cause)
+        }
+
+        and: 'check the exception'
+        def exception = thrown(InventoryException)
+        exception.cause.cause == cause
+        exception.message == InventoryExceptionMapper.DEFAULT_MESSAGE
+    }
+
+    def 'Successfully deleting an item'() {
+        given: 'the item is present in the inventory'
         itemPersistence.loadItems() >> [item]
 
         when: 'the item is added'
@@ -44,15 +62,28 @@ class InventoryServiceSpec extends Specification {
         1 * itemPersistence.saveItems([])
     }
 
-    def 'getItemBySerialNumber correctly fetches an item'() {
-        given: 'an item'
-        def item = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
+    def 'Delete item that does not exist throws exception'() {
+        given: 'an empty inventory'
+        itemPersistence.loadItems() >> []
 
-        and: 'the item is in the inventory'
+        and: 'a serial number that does not exist in the inventory'
+        String serialNumber = 'non-existent serial number'
+
+        when: 'trying to delete the item with the non-existent serial number'
+        service.deleteItem(serialNumber)
+
+        then: 'an exception is thrown'
+        def exception = thrown(InventoryException)
+        exception.message == "An exception occurred while processing the request."
+    }
+
+
+    def 'Getting an item by serial number, correctly fetches it'() {
+        when: 'the item is in the inventory'
         itemPersistence.loadItems() >> [item]
         service = new InventoryService(itemPersistence)
 
-        expect: 'getItemBySerialNumber returns the correct item'
+        then: 'the service returns the correct item'
         service.getItemBySerialNumber(item.serialNumber).get() == item
     }
 
@@ -84,19 +115,5 @@ class InventoryServiceSpec extends Specification {
 
         expect: 'getItems returns an empty list'
         service.getItems().isEmpty()
-    }
-
-    def 'InventoryService properly handles exception thrown by IItemPersistence'() {
-        given: 'an item'
-        def item = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
-
-        and: 'IItemPersistence throws an exception when trying to save items'
-        itemPersistence.saveItems(_) >> { throw new RuntimeException('Test exception') }
-
-        when: 'addItem is called'
-        service.addItem(item)
-
-        then: 'a RuntimeException is thrown'
-        thrown(RuntimeException)
     }
 }
