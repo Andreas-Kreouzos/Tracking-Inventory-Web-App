@@ -44,7 +44,7 @@ public class InventoryResource {
     }
 
     @GET
-    @Path("/{serialNumber}")
+    @Path("{serialNumber}")
     public Response getItemBySerialNumber(
             @PathParam("serialNumber") String serialNumber) {
         Optional<Item> item = service.getItemBySerialNumber(serialNumber);

@@ -12,6 +12,7 @@ import org.glassfish.jersey.test.JerseyTest
 import spock.lang.Specification
 
 abstract class ResourceSpecification extends Specification {
+
     JerseyTest jerseyTest
     Jsonb jsonb
 

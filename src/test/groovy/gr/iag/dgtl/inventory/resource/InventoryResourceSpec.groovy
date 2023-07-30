@@ -3,6 +3,7 @@ package gr.iag.dgtl.inventory.resource
 import gr.iag.dgtl.inventory.ResourceSpecification
 import gr.iag.dgtl.inventory.TestItemProvider
 import gr.iag.dgtl.inventory.dto.ErrorResponse
+import gr.iag.dgtl.inventory.dto.Item
 import gr.iag.dgtl.inventory.exception.InventoryException
 import gr.iag.dgtl.inventory.service.IInventoryService
 import groovy.json.JsonSlurper
@@ -34,32 +35,38 @@ class InventoryResourceSpec extends ResourceSpecification {
         1 * service.addItem(_)
         response.status == Response.Status.OK.statusCode
 
-        and: 'the claim response contains the claimId'
+        and: 'the response contains the item'
         def jsonResponse = new JsonSlurper().parseText(response.readEntity(String))
         jsonResponse.status == "SUCCESS"
     }
 
-    def '500 response with a related message if a RuntimeException occurs'() {
-        given: 'a valid create claim request'
+    def 'The POST service does not interfere with thrown exceptions'() {
+        given: 'a valid item'
         def jsonReq = jsonb.toJson(TestItemProvider.createItem())
 
-        and: 'the error data'
-        def errMsg = 'An exception happened'
+        and: 'some error parameters'
+        def cause = new Exception()
+        def errorMsg = 'An exception happened'
 
-        when: 'the API is called with valid input'
+        when: 'the POST service handles the request'
         def response = jerseyPost(jsonReq, BASE_URL)
 
         then: 'the service is called and throws an exception'
-        1 * service.addItem(_) >> { throw new InventoryException(errMsg) }
+        1 * service.addItem(_) >> {
+            throw new InventoryException(errorMsg, cause)
+        }
 
-        and: 'the response is 500 with the error message we await'
+        and: 'a 500 response is received'
         response.status == Response.Status.INTERNAL_SERVER_ERROR.statusCode
-        def jsonResponse = new JsonSlurper().parseText(response.readEntity(String))
-        jsonResponse.errors == [errMsg]
+
+        and: 'the error response contains the expected message'
+        def errorResponse = response.readEntity(ErrorResponse.class)
+        errorResponse.errors.size() == 1
+        errorResponse.errors[0] == errorMsg
     }
 
     @Unroll
-    def '400 response for a request when creating an Item Request with invalid parameters'() {
+    def '400 response for a request when creating an Item with invalid parameters'() {
         given: 'a request with invalid data'
         def jsonReq = jsonb.toJson(invalidItemRequest)
 
@@ -85,43 +92,34 @@ class InventoryResourceSpec extends ResourceSpecification {
     }
 
     def 'Successful get item request'() {
-        given: 'a valid item'
+        given: 'a valid item request'
         def item = TestItemProvider.createItem()
+
+        and: 'mocking the service get method with this item'
         service.getItemBySerialNumber(item.serialNumber) >> Optional.of(item)
 
-        when: 'trying to get the item'
+        when: 'calling the get method of the resource'
         def response = jerseyGet(item.serialNumber, BASE_URL)
 
         then: 'the response is OK and returns the item'
         response.status == Response.Status.OK.statusCode
-        def jsonResponse = new JsonSlurper().parseText(response.readEntity(String))
+
+        and: 'the response contains the item'
+        def jsonResponse = response.readEntity(Item.class)
         jsonResponse.name == item.name
         jsonResponse.serialNumber == item.serialNumber
         jsonResponse.value == item.value
     }
 
-    def 'Successful delete item request'() {
-        given: 'a valid item'
-        def item = TestItemProvider.createItem()
-        service.getItemBySerialNumber(item.serialNumber) >> Optional.of(item)
-
-        when: 'trying to delete the item'
-        def response = jerseyDelete(item.serialNumber, BASE_URL)
-
-        then: 'the response is No Content'
-        1 * service.deleteItem(item.serialNumber)
-        response.status == Response.Status.NO_CONTENT.statusCode
-    }
-
-    def 'the GET service does not interfere with thrown exceptions'() {
+    def 'The GET service does not interfere with thrown exceptions'() {
         given: 'a valid item'
         def item = TestItemProvider.createItem()
 
         and: 'some error parameters'
         def cause = new Exception()
-        def errorMsg = 'a message'
+        def errorMsg = 'An exception happened'
 
-        and: 'the service throws an exception'
+        and: 'the service is called and throws an exception'
         1 * service.getItemBySerialNumber(item.serialNumber) >> {
             throw new InventoryException(errorMsg, cause)
         }
@@ -131,7 +129,50 @@ class InventoryResourceSpec extends ResourceSpecification {
 
         then: 'a 500 response is received'
         response.status == Response.Status.INTERNAL_SERVER_ERROR.statusCode
-        response.readEntity(ErrorResponse.class).errors.size() == 1
+
+        and: 'the error response contains the expected message'
+        def errorResponse = response.readEntity(ErrorResponse.class)
+        errorResponse.errors.size() == 1
+        errorResponse.errors[0] == errorMsg
     }
 
+    def 'Successful delete item request'() {
+        given: 'a valid item'
+        def item = TestItemProvider.createItem()
+
+        and: 'mocking the service get method with this item'
+        service.getItemBySerialNumber(item.serialNumber) >> Optional.of(item)
+
+        when: 'calling the delete method of the resource'
+        def response = jerseyDelete(item.serialNumber, BASE_URL)
+
+        then: 'the response is No Content'
+        1 * service.deleteItem(item.serialNumber)
+        response.status == Response.Status.NO_CONTENT.statusCode
+    }
+
+    def 'The DELETE service does not interfere with thrown exceptions'() {
+        given: 'a valid item'
+        def item = TestItemProvider.createItem()
+
+        and: 'some error parameters'
+        def cause = new Exception()
+        def errorMsg = 'An exception happened'
+
+        and: 'the service is called and throws an exception'
+        1 * service.deleteItem(item.serialNumber) >> {
+            throw new InventoryException(errorMsg, cause)
+        }
+
+        when: 'the DELETE service handles a request'
+        def response = jerseyDelete(item.serialNumber, BASE_URL)
+
+        then: 'a 500 response is received'
+        response.status == Response.Status.INTERNAL_SERVER_ERROR.statusCode
+
+        and: 'the error response contains the expected message'
+        def errorResponse = response.readEntity(ErrorResponse.class)
+        errorResponse.errors.size() == 1
+        errorResponse.errors[0] == errorMsg
+    }
 }
