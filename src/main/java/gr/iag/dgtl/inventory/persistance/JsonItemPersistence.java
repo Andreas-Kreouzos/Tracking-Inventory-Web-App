@@ -1,9 +1,13 @@
 package gr.iag.dgtl.inventory.persistance;
 
 import gr.iag.dgtl.inventory.dto.Item;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.io.File;
 import java.io.FileReader;
@@ -18,12 +22,16 @@ import java.util.List;
  *
  * @author kreouzosa
  */
+@ApplicationScoped
+@Named("JsonItemPersistence")
 public class JsonItemPersistence implements IItemPersistence {
 
     private static String DATA_FILE;
     private final Jsonb jsonb;
 
-    public JsonItemPersistence(String dataFile) {
+    @Inject
+    public JsonItemPersistence(
+            @ConfigProperty(name = "json.data.file.path") String dataFile) {
         DATA_FILE = dataFile;
         JsonbConfig config = new JsonbConfig().withFormatting(true);
         this.jsonb = JsonbBuilder.create(config);

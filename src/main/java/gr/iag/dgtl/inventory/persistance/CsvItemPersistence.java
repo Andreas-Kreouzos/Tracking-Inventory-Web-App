@@ -4,6 +4,10 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import gr.iag.dgtl.inventory.dto.Item;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -18,11 +22,15 @@ import java.util.List;
  *
  * @author kreouzosa
  */
+@ApplicationScoped
+@Named("CsvItemPersistence")
 public class CsvItemPersistence implements IItemPersistence {
 
     private final String filePath;
 
-    public CsvItemPersistence(String filePath) {
+    @Inject
+    public CsvItemPersistence(
+            @ConfigProperty(name = "csv.file.path") String filePath) {
         this.filePath = filePath;
     }
 

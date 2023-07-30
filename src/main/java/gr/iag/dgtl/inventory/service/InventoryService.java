@@ -5,8 +5,10 @@ import gr.iag.dgtl.inventory.exception.InventoryException;
 import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper;
 import gr.iag.dgtl.inventory.persistance.IItemPersistence;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import jakarta.inject.Named;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +20,26 @@ public class InventoryService implements IInventoryService {
     private static final Logger LOGGER =
             LoggerFactory.getLogger(InventoryService.class);
 
+    private final IItemPersistence htmlPersistence;
+    private final IItemPersistence jsonPersistence;
+    private final IItemPersistence csvPersistence;
     private final List<Item> items;
-    private final IItemPersistence itemPersistence;
 
+/*    @Inject
     public InventoryService(IItemPersistence itemPersistence) {
         this.itemPersistence = itemPersistence;
         List<Item> loadedItems = itemPersistence.loadItems();
         this.items = loadedItems != null ? loadedItems : new ArrayList<>();
+    }*/
+
+    @Inject
+    public InventoryService(@Named("HtmlItemPersistence") IItemPersistence htmlPersistence,
+                            @Named("JsonItemPersistence") IItemPersistence jsonPersistence,
+                            @Named("CsvItemPersistence") IItemPersistence csvPersistence) {
+        this.htmlPersistence = htmlPersistence;
+        this.jsonPersistence = jsonPersistence;
+        this.csvPersistence = csvPersistence;
+        this.items = new ArrayList<>();
     }
 
     @Override
@@ -45,7 +60,9 @@ public class InventoryService implements IInventoryService {
                     });
 
             items.add(item);
-            itemPersistence.saveItems(items);
+            htmlPersistence.saveItems(items);
+            jsonPersistence.saveItems(items);
+            csvPersistence.saveItems(items);
         } catch (Exception ex) {
             LOGGER.error("Error upon adding an Item with serialNumber={}", item.getSerialNumber(), ex);
             throw new InventoryException(InventoryExceptionMapper.DEFAULT_MESSAGE, ex);
@@ -69,7 +86,9 @@ public class InventoryService implements IInventoryService {
             Item item = getItemBySerialNumber(serialNumber)
                     .orElseThrow(() -> new InventoryException("Item not found"));
             items.remove(item);
-            itemPersistence.saveItems(items);
+            htmlPersistence.saveItems(items);
+            jsonPersistence.saveItems(items);
+            csvPersistence.saveItems(items);
         } catch (Exception ex) {
             LOGGER.error("Error upon deleting an Item with serialNumber={}", serialNumber, ex);
             throw new InventoryException(InventoryExceptionMapper.DEFAULT_MESSAGE, ex);

@@ -1,6 +1,10 @@
 package gr.iag.dgtl.inventory.persistance;
 
 import gr.iag.dgtl.inventory.dto.Item;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,11 +24,15 @@ import java.util.List;
  *
  * @author kreouzosa
  */
+@ApplicationScoped
+@Named("HtmlItemPersistence")
 public class HtmlItemPersistence implements IItemPersistence {
 
     private final String filePath;
 
-    public HtmlItemPersistence(String filePath) {
+    @Inject
+    public HtmlItemPersistence(
+            @ConfigProperty(name = "html.file.path") String filePath) {
         this.filePath = filePath;
     }
 
