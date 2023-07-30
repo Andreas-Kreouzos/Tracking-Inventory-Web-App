@@ -77,7 +77,6 @@ class InventoryServiceSpec extends Specification {
         exception.message == "An exception occurred while processing the request."
     }
 
-
     def 'Getting an item by serial number, correctly fetches it'() {
         when: 'the item is in the inventory'
         itemPersistence.loadItems() >> [item]
@@ -87,26 +86,25 @@ class InventoryServiceSpec extends Specification {
         service.getItemBySerialNumber(item.serialNumber).get() == item
     }
 
-    def 'getItemBySerialNumber returns empty if item is not in inventory'() {
-        given: 'an item serial number'
+    def 'Empty optional returned if item is not in the inventory'() {
+        given: 'an item serial number that does not exist'
         String serialNumber = 'non-existent serial number'
 
         and: 'the inventory is empty'
         itemPersistence.loadItems() >> []
 
-        expect: 'getItemBySerialNumber returns empty'
+        expect: 'an empty optional'
         !service.getItemBySerialNumber(serialNumber).isPresent()
     }
 
     def 'getItems returns all items in inventory'() {
         given: 'several items in the inventory'
-        def item1 = new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
         def item2 = new Item('Playstation 5','PS1234XYZ', 499 as BigDecimal)
-        itemPersistence.loadItems() >> [item1, item2]
+        itemPersistence.loadItems() >> [item, item2]
         service = new InventoryService(itemPersistence)
 
         expect: 'getItems returns all items'
-        service.getItems() == [item1, item2]
+        service.getItems() == [item, item2]
     }
 
     def 'getItems returns an empty list if the inventory is empty'() {
