@@ -39,13 +39,7 @@ tasks.withType(Checkstyle) {
 
 repositories {
     mavenLocal()
-    maven {
-        url = "https://nexus.interamerican.gr/content/groups/public"
-        credentials {
-            username "$usr"
-            password "$pwd"
-        }
-    }
+    mavenCentral()
 }
 
 test {
