@@ -2,16 +2,17 @@ package gr.iag.dgtl.inventory
 
 import gr.iag.dgtl.inventory.dto.Item
 
+import java.math.RoundingMode
+
 class TestItemProvider {
 
     private static final Random RANDOM = new Random()
 
     def static generateRandomItem() {
-        String name = UUID.randomUUID().toString()
-        String serialNumber = UUID.randomUUID().toString()
-
-        // Generates a random BigDecimal between 0.1 and 1000.0.
-        BigDecimal value = BigDecimal.valueOf(0.1 + (999.9 * RANDOM.nextDouble())).setScale(2, BigDecimal.ROUND_HALF_UP);
+        def name = UUID.randomUUID().toString()
+        def serialNumber = UUID.randomUUID().toString()
+        def value =
+                BigDecimal.valueOf(0.1 + (999.9 * RANDOM.nextDouble())).setScale(2, RoundingMode.HALF_UP)
 
         return new Item(name, serialNumber, value);
     }
