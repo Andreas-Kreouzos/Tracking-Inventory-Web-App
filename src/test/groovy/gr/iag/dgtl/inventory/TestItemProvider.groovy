@@ -4,6 +4,18 @@ import gr.iag.dgtl.inventory.dto.Item
 
 class TestItemProvider {
 
+    private static final Random RANDOM = new Random()
+
+    def static generateRandomItem() {
+        String name = UUID.randomUUID().toString()
+        String serialNumber = UUID.randomUUID().toString()
+
+        // Generates a random BigDecimal between 0.1 and 1000.0.
+        BigDecimal value = BigDecimal.valueOf(0.1 + (999.9 * RANDOM.nextDouble())).setScale(2, BigDecimal.ROUND_HALF_UP);
+
+        return new Item(name, serialNumber, value);
+    }
+
     def static createItem() {
         new Item('Xbox One','AXB124AXY', 500 as BigDecimal)
     }

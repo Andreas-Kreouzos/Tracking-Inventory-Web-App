@@ -25,13 +25,6 @@ public class InventoryService implements IInventoryService {
     private final IItemPersistence csvPersistence;
     private final List<Item> items;
 
-/*    @Inject
-    public InventoryService(IItemPersistence itemPersistence) {
-        this.itemPersistence = itemPersistence;
-        List<Item> loadedItems = itemPersistence.loadItems();
-        this.items = loadedItems != null ? loadedItems : new ArrayList<>();
-    }*/
-
     @Inject
     public InventoryService(@Named("HtmlItemPersistence") IItemPersistence htmlPersistence,
                             @Named("JsonItemPersistence") IItemPersistence jsonPersistence,

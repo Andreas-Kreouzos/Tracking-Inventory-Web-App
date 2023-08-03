@@ -24,24 +24,13 @@ class TrackingInventoryIntegrationSpec extends Specification {
 
     def 'successful create item'() {
         given: 'setup the item'
-        def requestBody = TestItemProvider.createItem()
+        def requestBody = TestItemProvider.generateRandomItem()
 
         when: 'the call is succeeded'
         def response = doPostCreate(jsonb.toJson(requestBody))
 
         then: 'empty response body means successful request'
-        if (response.status != Response.Status.OK.statusCode) {
-            println response.readEntity(String.class)  // Print the response body
-        }
         response.status == Response.Status.OK.statusCode
-
-        cleanup:
-        File htmlfile = new File('C:/Users/kreouzosa/Desktop/file.html')
-        htmlfile.delete()
-        File jsonfile = new File('C:/Users/kreouzosa/Desktop/file.json')
-        jsonfile.delete()
-        File csvfile = new File('C:/Users/kreouzosa/Desktop/file.csv')
-        csvfile.delete()
     }
 
     def doPostCreate(Object requestPayload) {
