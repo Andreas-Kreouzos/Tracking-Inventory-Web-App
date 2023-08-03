@@ -22,7 +22,7 @@ class TrackingInventoryIntegrationSpec extends Specification {
         jsonb = JsonbBuilder.create()
     }
 
-    def 'successful create item'() {
+    def 'Successful create item and persist it into JSON, HTML and CSV'() {
         given: 'setup the item'
         def requestBody = TestItemProvider.generateRandomItem()
 
