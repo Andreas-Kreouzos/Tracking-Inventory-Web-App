@@ -1,4 +1,4 @@
-package gr.iag.dgtl.inventory.persistance;
+package gr.iag.dgtl.inventory.persistence;
 
 import gr.iag.dgtl.inventory.dto.Item;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -9,6 +9,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,12 +30,15 @@ import java.util.List;
 @Named("HtmlItemPersistence")
 public class HtmlItemPersistence implements IItemPersistence {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(HtmlItemPersistence.class);
+
     private final String filePath;
 
     @Inject
     public HtmlItemPersistence(
             @ConfigProperty(name = "html.file.path") String filePath) {
         this.filePath = filePath;
+        LOGGER.info("HTML file path: {}", filePath);
     }
 
     /**
@@ -41,6 +46,7 @@ public class HtmlItemPersistence implements IItemPersistence {
      */
     @Override
     public List<Item> loadItems() {
+        LOGGER.info("Attempting to load items from HTML");
         List<Item> items = new ArrayList<>();
         try {
             Document document = Jsoup.parse(new File(filePath), "UTF-8");
@@ -57,9 +63,12 @@ public class HtmlItemPersistence implements IItemPersistence {
 
                 items.add(new Item(name, serialNumber, value));
             }
+            LOGGER.info("Successfully loaded {} items from HTML", items.size());
         } catch (FileNotFoundException e) {
+            LOGGER.info("HTML file does not exist, returning empty list");
             return items;
         } catch (IOException e) {
+            LOGGER.error("Failed to load items from HTML file", e);
             throw new RuntimeException("Failed to load items from HTML file", e);
         }
         return items;
@@ -70,6 +79,7 @@ public class HtmlItemPersistence implements IItemPersistence {
      */
     @Override
     public void saveItems(List<Item> items) {
+        LOGGER.info("Attempting to save {} items to HTML", items.size());
         StringBuilder htmlContent = new StringBuilder("<table>\n" +
                 "<tr><th>Name</th><th>Serial Number</th><th>Value</th></tr>\n");
 
@@ -91,7 +101,9 @@ public class HtmlItemPersistence implements IItemPersistence {
 
         try {
             Files.write(Paths.get(filePath), htmlContent.toString().getBytes());
+            LOGGER.info("Successfully saved {} items to HTML", items.size());
         } catch (IOException e) {
+            LOGGER.error("Failed to save items to HTML file", e);
             throw new RuntimeException("Failed to save items to HTML file", e);
         }
     }
