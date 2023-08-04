@@ -1,4 +1,4 @@
-package gr.iag.dgtl.inventory.persistance
+package gr.iag.dgtl.inventory.persistence
 
 import gr.iag.dgtl.inventory.dto.Item
 import org.jsoup.Jsoup

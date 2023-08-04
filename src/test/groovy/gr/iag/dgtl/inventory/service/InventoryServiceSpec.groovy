@@ -4,7 +4,7 @@ import gr.iag.dgtl.inventory.TestItemProvider
 import gr.iag.dgtl.inventory.dto.Item
 import gr.iag.dgtl.inventory.exception.InventoryException
 import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper
-import gr.iag.dgtl.inventory.persistance.IItemPersistence
+import gr.iag.dgtl.inventory.persistence.IItemPersistence
 import spock.lang.Specification
 import spock.lang.Subject
 
