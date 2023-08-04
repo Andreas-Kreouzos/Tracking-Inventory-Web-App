@@ -3,7 +3,7 @@ package gr.iag.dgtl.inventory.service;
 import gr.iag.dgtl.inventory.dto.Item;
 import gr.iag.dgtl.inventory.exception.InventoryException;
 import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper;
-import gr.iag.dgtl.inventory.persistance.IItemPersistence;
+import gr.iag.dgtl.inventory.persistence.IItemPersistence;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -44,12 +44,12 @@ public class InventoryService implements IInventoryService {
     public void addItem(Item item) {
         try {
             if (item == null) {
-                throw new InventoryException("Cannot add null item to inventory", null);
+                throw new InventoryException("Cannot add null item to inventory");
             }
 
             getItemBySerialNumber(item.getSerialNumber())
                     .ifPresent(existingItem -> {
-                        throw new InventoryException("Item with this serial number already exists in inventory", null);
+                        throw new InventoryException("Item with this serial number already exists in inventory");
                     });
 
             items.add(item);
