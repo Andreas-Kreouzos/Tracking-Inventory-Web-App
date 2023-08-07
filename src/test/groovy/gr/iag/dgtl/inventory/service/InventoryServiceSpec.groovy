@@ -3,6 +3,7 @@ package gr.iag.dgtl.inventory.service
 import gr.iag.dgtl.inventory.TestItemProvider
 import gr.iag.dgtl.inventory.dto.Item
 import gr.iag.dgtl.inventory.exception.InventoryException
+import gr.iag.dgtl.inventory.exception.ResourceNotFoundException
 import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper
 import gr.iag.dgtl.inventory.persistence.IItemPersistence
 import spock.lang.Specification
@@ -12,9 +13,9 @@ class InventoryServiceSpec extends Specification {
 
     @Subject
     InventoryService service
-    IItemPersistence htmlPersistence;
-    IItemPersistence jsonPersistence;
-    IItemPersistence csvPersistence;
+    IItemPersistence htmlPersistence
+    IItemPersistence jsonPersistence
+    IItemPersistence csvPersistence
 
     def item = TestItemProvider.createItem()
 
@@ -22,6 +23,9 @@ class InventoryServiceSpec extends Specification {
         htmlPersistence = Mock(IItemPersistence)
         jsonPersistence = Mock(IItemPersistence)
         csvPersistence = Mock(IItemPersistence)
+        jsonPersistence.loadItems() >> []
+        htmlPersistence.loadItems() >> []
+        csvPersistence.loadItems() >> []
         service = new InventoryService(htmlPersistence, jsonPersistence, csvPersistence)
     }
 
@@ -44,10 +48,10 @@ class InventoryServiceSpec extends Specification {
         service.addItem(item)
 
         then: 'the persistence will throw an exception'
-        1 * htmlPersistence.saveItems(_) >> {
+        1 * jsonPersistence.saveItems(_) >> {
             throw new InventoryException(errorMsg, cause)
         }
-        0 * jsonPersistence.saveItems(_)
+        0 * htmlPersistence.saveItems(_)
         0 * csvPersistence.saveItems(_)
 
         and: 'check the exception'
@@ -96,15 +100,18 @@ class InventoryServiceSpec extends Specification {
         service.addItem(item)
 
         then: 'the service returns the correct item'
-        service.getItemBySerialNumber(item.serialNumber).get() == item
+        service.getItemBySerialNumber(item.serialNumber) == item
     }
 
-    def 'Empty optional returned if item is not in the inventory'() {
+    def 'ResourceNotFoundException thrown if item is not in the inventory'() {
         given: 'an item serial number that does not exist'
         String serialNumber = 'non-existent serial number'
 
-        expect: 'an empty optional'
-        !service.getItemBySerialNumber(serialNumber).isPresent()
+        when: 'service is called with the non-existent serial number'
+        service.getItemBySerialNumber(serialNumber)
+
+        then: 'an exception is thrown'
+        thrown(ResourceNotFoundException)
     }
 
     def 'getItems returns all items in inventory'() {

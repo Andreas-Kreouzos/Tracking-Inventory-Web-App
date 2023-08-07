@@ -25,9 +25,9 @@ public interface IInventoryService {
     /**
      * Gets an Item from the inventory by using the serial number
      * @param serialNumber the serial number of the Item
-     * @return an Optional of the Item
+     * @return the Item
      */
-    Optional<Item> getItemBySerialNumber(String serialNumber);
+    Item getItemBySerialNumber(String serialNumber);
 
     /**
      * Deletes an Item from the inventory by using the serial number

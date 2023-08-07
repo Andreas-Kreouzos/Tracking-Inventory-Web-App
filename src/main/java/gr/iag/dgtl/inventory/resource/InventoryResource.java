@@ -47,8 +47,8 @@ public class InventoryResource {
     @Path("{serialNumber}")
     public Response getItemBySerialNumber(
             @PathParam("serialNumber") String serialNumber) {
-        Optional<Item> item = service.getItemBySerialNumber(serialNumber);
-        return Response.ok(item.get()).build();
+        Item item = service.getItemBySerialNumber(serialNumber);
+        return Response.ok(item).build();
     }
 
     @DELETE

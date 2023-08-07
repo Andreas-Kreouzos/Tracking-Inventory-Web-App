@@ -96,7 +96,7 @@ class InventoryResourceSpec extends ResourceSpecification {
         def item = TestItemProvider.createItem()
 
         and: 'mocking the service get method with this item'
-        service.getItemBySerialNumber(item.serialNumber) >> Optional.of(item)
+        service.getItemBySerialNumber(item.serialNumber) >> item
 
         when: 'calling the get method of the resource'
         def response = jerseyGet(item.serialNumber, BASE_URL)
@@ -141,7 +141,7 @@ class InventoryResourceSpec extends ResourceSpecification {
         def item = TestItemProvider.createItem()
 
         and: 'mocking the service get method with this item'
-        service.getItemBySerialNumber(item.serialNumber) >> Optional.of(item)
+        service.getItemBySerialNumber(item.serialNumber) >> item
 
         when: 'calling the delete method of the resource'
         def response = jerseyDelete(item.serialNumber, BASE_URL)

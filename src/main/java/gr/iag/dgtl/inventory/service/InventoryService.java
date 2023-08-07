@@ -2,6 +2,7 @@ package gr.iag.dgtl.inventory.service;
 
 import gr.iag.dgtl.inventory.dto.Item;
 import gr.iag.dgtl.inventory.exception.InventoryException;
+import gr.iag.dgtl.inventory.exception.ResourceNotFoundException;
 import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper;
 import gr.iag.dgtl.inventory.persistence.IItemPersistence;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -12,7 +13,6 @@ import jakarta.inject.Named;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @ApplicationScoped
 public class InventoryService implements IInventoryService {
@@ -33,6 +33,9 @@ public class InventoryService implements IInventoryService {
         this.jsonPersistence = jsonPersistence;
         this.csvPersistence = csvPersistence;
         this.items = new ArrayList<>();
+        this.items.addAll(htmlPersistence.loadItems());
+        this.items.addAll(jsonPersistence.loadItems());
+        this.items.addAll(csvPersistence.loadItems());
     }
 
     @Override
@@ -47,14 +50,13 @@ public class InventoryService implements IInventoryService {
                 throw new InventoryException("Cannot add null item to inventory");
             }
 
-            getItemBySerialNumber(item.getSerialNumber())
-                    .ifPresent(existingItem -> {
-                        throw new InventoryException("Item with this serial number already exists in inventory");
-                    });
+            if(findItemBySerialNumber(item.getSerialNumber()) != null) {
+                throw new InventoryException("Item with this serial number already exists in inventory");
+            }
 
             items.add(item);
-            htmlPersistence.saveItems(items);
             jsonPersistence.saveItems(items);
+            htmlPersistence.saveItems(items);
             csvPersistence.saveItems(items);
         } catch (Exception ex) {
             LOGGER.error("Error upon adding an Item with serialNumber={}", item.getSerialNumber(), ex);
@@ -62,22 +64,28 @@ public class InventoryService implements IInventoryService {
         }
     }
 
-
-    @Override
-    public Optional<Item> getItemBySerialNumber(String serialNumber) {
+    private Item findItemBySerialNumber(String serialNumber) {
         for (Item item : items) {
             if (item.getSerialNumber().equals(serialNumber)) {
-                return Optional.of(item);
+                return item;
             }
         }
-        return Optional.empty();
+        return null;
+    }
+
+    @Override
+    public Item getItemBySerialNumber(String serialNumber) {
+        Item item = findItemBySerialNumber(serialNumber);
+        if (item == null) {
+            throw new ResourceNotFoundException("Item with serial number: " + serialNumber + " not found");
+        }
+        return item;
     }
 
     @Override
     public void deleteItem(String serialNumber) {
         try {
-            Item item = getItemBySerialNumber(serialNumber)
-                    .orElseThrow(() -> new InventoryException("Item not found"));
+            Item item = getItemBySerialNumber(serialNumber);
             items.remove(item);
             htmlPersistence.saveItems(items);
             jsonPersistence.saveItems(items);
