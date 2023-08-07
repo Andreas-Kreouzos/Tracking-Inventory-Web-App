@@ -2,6 +2,7 @@ package integration.gr.iag.dgtl.inventory
 
 import gr.iag.dgtl.inventory.PropertyReader
 import gr.iag.dgtl.inventory.TestItemProvider
+import gr.iag.dgtl.inventory.dto.ErrorResponse
 import jakarta.json.bind.Jsonb
 import jakarta.json.bind.JsonbBuilder
 import jakarta.ws.rs.client.Client
@@ -27,17 +28,59 @@ class TrackingInventoryIntegrationSpec extends Specification {
         def requestBody = TestItemProvider.generateRandomItem()
 
         when: 'the call is succeeded'
-        def response = doPostCreate(jsonb.toJson(requestBody))
+        def response = doPost(jsonb.toJson(requestBody))
 
         then: 'empty response body means successful request'
         response.status == Response.Status.OK.statusCode
     }
 
-    def doPostCreate(Object requestPayload) {
+    def 'Failed to create the item'() {
+        given: 'an item with null name'
+        def requestBody = TestItemProvider.createItemWithNullName()
+
+        when: 'calling the application with this item'
+        def response = doPost(jsonb.toJson(requestBody))
+
+        then: 'a response with error message is returned'
+        response.status != Response.Status.OK.statusCode
+        response.readEntity(ErrorResponse.class).errors.size() > 0
+    }
+
+    def 'Successfully get an item'() {
+        when: 'the call is made to the get api'
+        def response = doGet('e3d60c63-95e2-4d3f-83ad-5daff215c717')
+
+        then: 'the response contains an OK status'
+        response.status == Response.Status.OK.statusCode
+
+        and: 'the response body contains the correct information'
+        response.readEntity(String.class) == '{"name":"1b19e911-0b1d-44f4-b72c-d000c56cc634","serialNumber":"e3d60c63-95e2-4d3f-83ad-5daff215c717","value":862.20}'
+    }
+
+    def 'Getting an Item that is not persisted'() {
+        when: 'the call is made to the get api'
+        def response = doGet('e3d60c63-95e2-4d3f-83ad-5daff215c718')
+
+        then: 'the response contains an OK status'
+        response.status == Response.Status.NOT_FOUND.statusCode
+
+        and: 'the response body contains the correct information'
+        response.readEntity(String.class) == '{"errors":["Item with serial number: e3d60c63-95e2-4d3f-83ad-5daff215c718 not found"]}'
+    }
+
+    def doPost(Object requestPayload) {
 
         Client client = ClientBuilder.newClient()
         client.target(SERVICE_URL)
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(requestPayload))
+    }
+
+    def doGet(String serialNumber) {
+
+        Client client = ClientBuilder.newClient()
+        client.target(SERVICE_URL + '/' + serialNumber)
+                .request(MediaType.APPLICATION_JSON)
+                .get()
     }
 }
