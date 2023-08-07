@@ -8,12 +8,20 @@ import jakarta.ws.rs.ext.Provider;
 
 import java.util.List;
 
+/**
+ * Provides a consistent way of handling InventoryException instances
+ */
 @Provider
 public class InventoryExceptionMapper implements ExceptionMapper<InventoryException> {
 
     public final static String DEFAULT_MESSAGE =
             "An exception occurred while processing the request.";
 
+    /**
+     * Handles InventoryException by converting it into HTTP 500 Internal Server Error response
+     * @param exception the exception to map to a response
+     * @return a response of type INTERNAL SERVER ERROR along with the exception message
+     */
     @Override
     public Response toResponse(InventoryException exception) {
         ErrorResponse errResponse;

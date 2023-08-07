@@ -9,7 +9,9 @@ public class InventoryException extends RuntimeException {
     /**
      * Simple no-args constructor
      */
-    public InventoryException() { super(); }
+    public InventoryException() {
+        super();
+    }
 
     /**
      * Simple constructor that receives a {@link String} message to pass
