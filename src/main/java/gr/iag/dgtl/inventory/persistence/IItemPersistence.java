@@ -18,6 +18,13 @@ public interface IItemPersistence {
     List<Item> loadItems();
 
     /**
+     * Loads an item from a JSON, HTML or CSV file by using its serial number
+     *
+     * @return an item found with its serial number
+     */
+    Item getItemBySerialNumber(String serialNumber);
+
+    /**
      * Saves the given list of items to JSON, HTML or CSV file
      *
      * @param items the list of items to be saved

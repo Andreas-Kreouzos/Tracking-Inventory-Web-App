@@ -4,6 +4,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import gr.iag.dgtl.inventory.dto.Item;
+import gr.iag.dgtl.inventory.exception.ResourceNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -69,6 +70,15 @@ public class CsvItemPersistence implements IItemPersistence {
             throw new RuntimeException("Failed to load items from CSV file", e);
         }
         return items;
+    }
+
+    @Override
+    public Item getItemBySerialNumber(String serialNumber) {
+        List<Item> items = loadItems();
+        return items.stream()
+                .filter(item -> item.getSerialNumber().equals(serialNumber))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Item with serial number " + serialNumber + " not found"));
     }
 
 
