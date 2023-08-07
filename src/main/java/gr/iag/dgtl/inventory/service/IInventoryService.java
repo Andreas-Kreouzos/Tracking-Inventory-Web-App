@@ -1,9 +1,10 @@
 package gr.iag.dgtl.inventory.service;
 
 import gr.iag.dgtl.inventory.dto.Item;
+import gr.iag.dgtl.inventory.exception.InventoryException;
+import gr.iag.dgtl.inventory.exception.ResourceNotFoundException;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * IInventoryService is responsible for arranging the items inside the inventory
@@ -11,27 +12,31 @@ import java.util.Optional;
 public interface IInventoryService {
 
     /**
-     * Through this method, a list of items gets returned
-     * @return the List of Items
+     * Returns a list of all items in the inventory
+     * @return A new list containing all items in the inventory
      */
     List<Item> getItems();
 
     /**
-     * Adds an Item into inventory
-     * @param item the item itself
+     * Adds an item into inventory
+     * @param item The item to add to the inventory
+     * @throws InventoryException if the item is null or a duplicate
      */
     void addItem(Item item);
 
     /**
-     * Gets an Item from the inventory by using the serial number
-     * @param serialNumber the serial number of the Item
-     * @return the Item
+     * Returns the item with the provided serial number
+     * @param serialNumber the serial number of the item to retrieve
+     * @return the item with the provided serial number
+     * @throws ResourceNotFoundException if no item with the provided serial number exists
      */
     Item getItemBySerialNumber(String serialNumber);
 
     /**
-     * Deletes an Item from the inventory by using the serial number
-     * @param serialNumber the serial number of the Item
+     * Removes the item with the provided serial number from the inventory
+     * @param serialNumber the serial number of the item to remove
+     * @throws InventoryException if an error occurs during removal
+     * @throws ResourceNotFoundException if no item with the provided serial number exists
      */
     void deleteItem(String serialNumber);
 }

@@ -38,11 +38,17 @@ public class InventoryService implements IInventoryService {
         this.items.addAll(csvPersistence.loadItems());
     }
 
+    /**
+     * @see IInventoryService#getItems
+     */
     @Override
     public List<Item> getItems() {
         return new ArrayList<>(items);
     }
 
+    /**
+     * @see IInventoryService#addItem(Item) 
+     */
     @Override
     public void addItem(Item item) {
         try {
@@ -64,15 +70,9 @@ public class InventoryService implements IInventoryService {
         }
     }
 
-    private Item findItemBySerialNumber(String serialNumber) {
-        for (Item item : items) {
-            if (item.getSerialNumber().equals(serialNumber)) {
-                return item;
-            }
-        }
-        return null;
-    }
-
+    /**
+     * @see IInventoryService#getItemBySerialNumber(String) 
+     */
     @Override
     public Item getItemBySerialNumber(String serialNumber) {
         Item item = findItemBySerialNumber(serialNumber);
@@ -82,6 +82,9 @@ public class InventoryService implements IInventoryService {
         return item;
     }
 
+    /**
+     * @see IInventoryService#deleteItem(String) 
+     */
     @Override
     public void deleteItem(String serialNumber) {
         try {
@@ -94,5 +97,14 @@ public class InventoryService implements IInventoryService {
             LOGGER.error("Error upon deleting an Item with serialNumber={}", serialNumber, ex);
             throw new InventoryException(InventoryExceptionMapper.DEFAULT_MESSAGE, ex);
         }
+    }
+
+    private Item findItemBySerialNumber(String serialNumber) {
+        for (Item item : items) {
+            if (item.getSerialNumber().equals(serialNumber)) {
+                return item;
+            }
+        }
+        return null;
     }
 }
