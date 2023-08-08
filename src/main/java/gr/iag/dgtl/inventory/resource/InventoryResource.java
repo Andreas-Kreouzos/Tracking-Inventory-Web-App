@@ -16,8 +16,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
-import java.util.Optional;
-
 /**
  * Contains the API for creating a request to create a Json file.
  */

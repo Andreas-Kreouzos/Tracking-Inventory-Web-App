@@ -72,6 +72,9 @@ public class CsvItemPersistence implements IItemPersistence {
         return items;
     }
 
+    /**
+     * @see IItemPersistence#getItemBySerialNumber
+     */
     @Override
     public Item getItemBySerialNumber(String serialNumber) {
         List<Item> items = loadItems();
