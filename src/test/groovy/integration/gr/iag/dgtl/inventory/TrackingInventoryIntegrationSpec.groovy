@@ -47,14 +47,19 @@ class TrackingInventoryIntegrationSpec extends Specification {
     }
 
     def 'Successfully get an item'() {
+        given: 'an item is already created'
+        def requestBody = TestItemProvider.generateRandomItem()
+        doPost(jsonb.toJson(requestBody))
+
         when: 'the call is made to the get api'
-        def response = doGet('e3d60c63-95e2-4d3f-83ad-5daff215c717')
+        def response = doGet(requestBody.serialNumber)
 
         then: 'the response contains an OK status'
         response.status == Response.Status.OK.statusCode
 
         and: 'the response body contains the correct information'
-        response.readEntity(String.class) == '{"name":"1b19e911-0b1d-44f4-b72c-d000c56cc634","serialNumber":"e3d60c63-95e2-4d3f-83ad-5daff215c717","value":862.20}'
+        def expectedItem = jsonb.toJson(requestBody)
+        response.readEntity(String.class) == expectedItem
     }
 
     def 'Getting an Item that is not persisted'() {
@@ -66,6 +71,18 @@ class TrackingInventoryIntegrationSpec extends Specification {
 
         and: 'the response body contains the correct information'
         response.readEntity(String.class) == '{"errors":["Item with serial number: e3d60c63-95e2-4d3f-83ad-5daff215c718 not found"]}'
+    }
+
+    def 'Successfully delete an item'() {
+        given: 'an item is already created'
+        def requestBody = TestItemProvider.generateRandomItem()
+        doPost(jsonb.toJson(requestBody))
+
+        when: 'the call is made to the delete api'
+        def response = doDelete(requestBody.serialNumber)
+
+        then: 'the response contains an OK status'
+        response.status == Response.Status.NO_CONTENT.statusCode
     }
 
     def doPost(Object requestPayload) {
@@ -82,5 +99,13 @@ class TrackingInventoryIntegrationSpec extends Specification {
         client.target(SERVICE_URL + '/' + serialNumber)
                 .request(MediaType.APPLICATION_JSON)
                 .get()
+    }
+
+    def doDelete(String serialNumber) {
+
+        Client client = ClientBuilder.newClient()
+        client.target(SERVICE_URL + '/' + serialNumber)
+                .request(MediaType.APPLICATION_JSON)
+                .delete()
     }
 }
