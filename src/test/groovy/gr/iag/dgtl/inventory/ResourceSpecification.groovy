@@ -2,6 +2,7 @@ package gr.iag.dgtl.inventory
 
 import gr.iag.dgtl.inventory.mapper.ConstraintViolationExceptionMapper
 import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper
+import gr.iag.dgtl.inventory.mapper.ResourceNotFoundExceptionMapper
 import jakarta.json.bind.Jsonb
 import jakarta.json.bind.JsonbBuilder
 import jakarta.ws.rs.client.Entity
@@ -26,6 +27,7 @@ abstract class ResourceSpecification extends Specification {
                         .register(createResource())
                         .register(ConstraintViolationExceptionMapper)
                         .register(InventoryExceptionMapper)
+                        .register(ResourceNotFoundExceptionMapper)
             }
         }
         jerseyTest.setUp()
