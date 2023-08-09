@@ -1,7 +1,6 @@
 package gr.iag.dgtl.inventory.persistence;
 
 import gr.iag.dgtl.inventory.dto.Item;
-import gr.iag.dgtl.inventory.exception.ResourceNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -29,7 +28,7 @@ import java.util.List;
  */
 @ApplicationScoped
 @Named("HtmlItemPersistence")
-public class HtmlItemPersistence implements IItemPersistence {
+public class HtmlItemPersistence extends GenericPersistence implements IItemPersistence {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlItemPersistence.class);
 
@@ -73,18 +72,6 @@ public class HtmlItemPersistence implements IItemPersistence {
             throw new RuntimeException("Failed to load items from HTML file", e);
         }
         return items;
-    }
-
-    /**
-     * @see IItemPersistence#getItemBySerialNumber
-     */
-    @Override
-    public Item getItemBySerialNumber(String serialNumber) {
-        List<Item> items = loadItems();
-        return items.stream()
-                .filter(item -> item.getSerialNumber().equals(serialNumber))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Item with serial number " + serialNumber + " not found"));
     }
 
     /**

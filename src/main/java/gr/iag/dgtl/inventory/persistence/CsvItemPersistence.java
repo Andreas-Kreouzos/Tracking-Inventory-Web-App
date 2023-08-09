@@ -4,7 +4,6 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 import gr.iag.dgtl.inventory.dto.Item;
-import gr.iag.dgtl.inventory.exception.ResourceNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -27,7 +26,7 @@ import java.util.List;
  */
 @ApplicationScoped
 @Named("CsvItemPersistence")
-public class CsvItemPersistence implements IItemPersistence {
+public class CsvItemPersistence extends GenericPersistence implements IItemPersistence {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CsvItemPersistence.class);
 
@@ -71,19 +70,6 @@ public class CsvItemPersistence implements IItemPersistence {
         }
         return items;
     }
-
-    /**
-     * @see IItemPersistence#getItemBySerialNumber
-     */
-    @Override
-    public Item getItemBySerialNumber(String serialNumber) {
-        List<Item> items = loadItems();
-        return items.stream()
-                .filter(item -> item.getSerialNumber().equals(serialNumber))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Item with serial number " + serialNumber + " not found"));
-    }
-
 
     /**
      * @see IItemPersistence#saveItems(List)

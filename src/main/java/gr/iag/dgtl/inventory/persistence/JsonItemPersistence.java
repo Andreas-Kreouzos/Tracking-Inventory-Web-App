@@ -1,7 +1,6 @@
 package gr.iag.dgtl.inventory.persistence;
 
 import gr.iag.dgtl.inventory.dto.Item;
-import gr.iag.dgtl.inventory.exception.ResourceNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -27,7 +26,7 @@ import java.util.List;
  */
 @ApplicationScoped
 @Named("JsonItemPersistence")
-public class JsonItemPersistence implements IItemPersistence {
+public class JsonItemPersistence extends GenericPersistence implements IItemPersistence {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonItemPersistence.class);
 
@@ -64,18 +63,6 @@ public class JsonItemPersistence implements IItemPersistence {
             LOGGER.info("JSON file does not exist, returning empty list");
         }
         return items;
-    }
-
-    /**
-     * @see IItemPersistence#getItemBySerialNumber
-     */
-    @Override
-    public Item getItemBySerialNumber(String serialNumber) {
-        List<Item> items = loadItems();
-        return items.stream()
-                .filter(item -> item.getSerialNumber().equals(serialNumber))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Item with serial number " + serialNumber + " not found"));
     }
 
     /**
