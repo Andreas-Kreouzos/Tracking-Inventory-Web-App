@@ -4,7 +4,7 @@ import gr.iag.dgtl.inventory.TestItemProvider
 import gr.iag.dgtl.inventory.dto.Item
 import gr.iag.dgtl.inventory.exception.InventoryException
 import gr.iag.dgtl.inventory.exception.ResourceNotFoundException
-import gr.iag.dgtl.inventory.mapper.InventoryExceptionMapper
+import gr.iag.dgtl.inventory.mapper.ResourceNotFoundExceptionMapper
 import gr.iag.dgtl.inventory.persistence.IItemPersistence
 import spock.lang.Specification
 import spock.lang.Subject
@@ -56,8 +56,8 @@ class InventoryServiceSpec extends Specification {
 
         and: 'check the exception'
         def exception = thrown(InventoryException)
-        exception.cause.cause == cause
-        exception.message == InventoryExceptionMapper.DEFAULT_MESSAGE
+        exception.cause == cause
+        exception.message == errorMsg
     }
 
     def 'Successfully deleting an item'() {
@@ -91,30 +91,11 @@ class InventoryServiceSpec extends Specification {
         service.deleteItem(serialNumber)
 
         then: 'an exception is thrown'
-        def exception = thrown(InventoryException)
-        exception.message == InventoryExceptionMapper.DEFAULT_MESSAGE
+        def exception = thrown(ResourceNotFoundException)
+        exception.message == ResourceNotFoundExceptionMapper.DEFAULT_MESSAGE
     }
 
-    def 'Getting an item by serial number, correctly fetches it'() {
-        when: 'the item is in the inventory'
-        service.addItem(item)
-
-        then: 'the service returns the correct item'
-        service.getItemBySerialNumber(item.serialNumber) == item
-    }
-
-    def 'ResourceNotFoundException thrown if item is not in the inventory'() {
-        given: 'an item serial number that does not exist'
-        String serialNumber = 'non-existent serial number'
-
-        when: 'service is called with the non-existent serial number'
-        service.getItemBySerialNumber(serialNumber)
-
-        then: 'an exception is thrown'
-        thrown(ResourceNotFoundException)
-    }
-
-    def 'getItems returns all items in inventory'() {
+    def 'Return all items in inventory'() {
         given: 'several items in the inventory'
         def item2 = new Item('Playstation 5','PS1234XYZ', 499 as BigDecimal)
         service.addItem(item)
@@ -124,7 +105,7 @@ class InventoryServiceSpec extends Specification {
         service.getItems() == [item, item2]
     }
 
-    def 'getItems returns an empty list if the inventory is empty'() {
+    def 'Return an empty list if the inventory is empty'() {
         expect: 'getItems returns an empty list'
         service.getItems().isEmpty()
     }

@@ -25,14 +25,6 @@ public interface IInventoryService {
     void addItem(Item item);
 
     /**
-     * Returns the item with the provided serial number
-     * @param serialNumber the serial number of the item to retrieve
-     * @return the item with the provided serial number
-     * @throws ResourceNotFoundException if no item with the provided serial number exists
-     */
-    Item getItemBySerialNumber(String serialNumber);
-
-    /**
      * Removes the item with the provided serial number from the inventory
      * @param serialNumber the serial number of the item to remove
      * @throws InventoryException if an error occurs during removal
