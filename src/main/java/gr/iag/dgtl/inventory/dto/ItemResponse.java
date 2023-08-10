@@ -11,12 +11,6 @@ public class ItemResponse {
     public ItemResponse() {
     }
 
-    public ItemResponse(String status, String message, String itemId) {
-        this.status = status;
-        this.message = message;
-        this.itemId = itemId;
-    }
-
     public String getStatus() {
         return status;
     }
