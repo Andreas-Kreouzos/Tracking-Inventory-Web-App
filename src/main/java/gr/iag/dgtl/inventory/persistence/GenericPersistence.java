@@ -5,6 +5,8 @@ import gr.iag.dgtl.inventory.exception.ResourceNotFoundException;
 
 import java.util.List;
 
+import static gr.iag.dgtl.inventory.mapper.ResourceNotFoundExceptionMapper.DEFAULT_MESSAGE;
+
 /**
  * Provides a generic implementation for retrieving an {@link Item} by its serial number.
  * Subclasses are expected to define the actual mechanism for loading items from the respective data sources.
@@ -21,6 +23,6 @@ public abstract class GenericPersistence {
         return items.stream()
                 .filter(item -> item.getSerialNumber().equals(serialNumber))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Item with serial number " + serialNumber + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException(DEFAULT_MESSAGE));
     }
 }
