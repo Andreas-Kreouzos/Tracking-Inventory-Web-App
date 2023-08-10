@@ -46,9 +46,9 @@ abstract class ResourceSpecification extends Specification {
                 .post(Entity.json(jsonReq))
     }
 
-    protected Response jerseyGet(String serialNumber, String url) {
+    protected Response jerseyGet(String url) {
         jerseyTest
-                .target(url + "/" + serialNumber)
+                .target(url)
                 .request()
                 .get()
     }

@@ -16,6 +16,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
+import java.util.List;
+
 /**
  * Contains the API for creating a request to create a Json file.
  */
@@ -42,18 +44,15 @@ public class InventoryResource {
     }
 
     @GET
-    @Path("{serialNumber}")
-    public Response getItemBySerialNumber(
-            @PathParam("serialNumber") String serialNumber) {
-        Item item = service.getItemBySerialNumber(serialNumber);
-        return Response.ok(item).build();
+    public Response getItemBySerialNumber() {
+        List<Item> items = service.getItems();
+        return Response.ok(items).build();
     }
 
     @DELETE
     @Path("{serialNumber}")
     public Response delete(
             @PathParam("serialNumber") String serialNumber) {
-        service.getItemBySerialNumber(serialNumber);
         service.deleteItem(serialNumber);
         return Response.noContent().build();
     }

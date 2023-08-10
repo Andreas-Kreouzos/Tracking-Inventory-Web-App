@@ -7,6 +7,7 @@ import gr.iag.dgtl.inventory.dto.Item
 import gr.iag.dgtl.inventory.exception.InventoryException
 import gr.iag.dgtl.inventory.service.IInventoryService
 import groovy.json.JsonSlurper
+import jakarta.ws.rs.core.GenericType
 import jakarta.ws.rs.core.Response
 import spock.lang.Shared
 import spock.lang.Unroll
@@ -92,40 +93,40 @@ class InventoryResourceSpec extends ResourceSpecification {
     }
 
     def 'Successful get item request'() {
-        given: 'a valid item request'
-        def item = TestItemProvider.createItem()
+        given: 'a valid items request'
+        def items = [TestItemProvider.createItem()]
 
-        and: 'mocking the service get method with this item'
-        service.getItemBySerialNumber(item.serialNumber) >> item
+        and: 'mocking the service get method with this items'
+        service.getItems() >> items
 
         when: 'calling the get method of the resource'
-        def response = jerseyGet(item.serialNumber, BASE_URL)
+        def response = jerseyGet(BASE_URL)
 
-        then: 'the response is OK and returns the item'
+        then: 'the response is OK and returns the items'
         response.status == Response.Status.OK.statusCode
 
-        and: 'the response contains the item'
-        def jsonResponse = response.readEntity(Item.class)
-        jsonResponse.name == item.name
-        jsonResponse.serialNumber == item.serialNumber
-        jsonResponse.value == item.value
+        and: 'the response contains the items'
+        def jsonResponse = response.readEntity(new GenericType<List<Item>>() {})
+        jsonResponse[0].name == items[0].name
+        jsonResponse[0].serialNumber == items[0].serialNumber
+        jsonResponse[0].value == items[0].value
     }
 
     def 'The GET service does not interfere with thrown exceptions'() {
         given: 'a valid item'
-        def item = TestItemProvider.createItem()
+        def items = [TestItemProvider.createItem()]
 
         and: 'some error parameters'
         def cause = new Exception()
         def errorMsg = 'An exception happened'
 
         and: 'the service is called and throws an exception'
-        1 * service.getItemBySerialNumber(item.serialNumber) >> {
+        1 * service.getItems() >> {
             throw new InventoryException(errorMsg, cause)
         }
 
         when: 'the GET service handles a request'
-        def response = jerseyGet(item.serialNumber, BASE_URL)
+        def response = jerseyGet(BASE_URL)
 
         then: 'a 500 response is received'
         response.status == Response.Status.INTERNAL_SERVER_ERROR.statusCode
@@ -139,9 +140,6 @@ class InventoryResourceSpec extends ResourceSpecification {
     def 'Successful delete item request'() {
         given: 'a valid item'
         def item = TestItemProvider.createItem()
-
-        and: 'mocking the service get method with this item'
-        service.getItemBySerialNumber(item.serialNumber) >> item
 
         when: 'calling the delete method of the resource'
         def response = jerseyDelete(item.serialNumber, BASE_URL)
