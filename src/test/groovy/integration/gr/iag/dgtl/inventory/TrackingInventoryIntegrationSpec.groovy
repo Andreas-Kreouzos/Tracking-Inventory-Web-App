@@ -34,7 +34,7 @@ class TrackingInventoryIntegrationSpec extends Specification {
         def response = doPost(jsonb.toJson(requestBody))
 
         then: 'empty response body means successful request'
-        response.status == Response.Status.OK.statusCode
+        response.status == Response.Status.CREATED.statusCode
     }
 
     def 'Failed to create the item'() {
@@ -45,7 +45,7 @@ class TrackingInventoryIntegrationSpec extends Specification {
         def response = doPost(jsonb.toJson(requestBody))
 
         then: 'a response with error message is returned'
-        response.status != Response.Status.OK.statusCode
+        response.status != Response.Status.CREATED.statusCode
         response.readEntity(ErrorResponse.class).errors.size() > 0
     }
 
