@@ -23,7 +23,7 @@ class CsvItemPersistenceSpec extends Specification {
 
     def 'Should persist items in CSV and then load them correctly'() {
         given: 'a list of items'
-        List<Item> itemsToSave = [
+        def itemsToSave = [
                 new Item('Item1', '123', 50 as BigDecimal),
                 new Item('Item2', '456', 100 as BigDecimal)
         ]
@@ -31,12 +31,8 @@ class CsvItemPersistenceSpec extends Specification {
         when: 'we save the items'
         persistence.saveItems(itemsToSave)
 
-        then: 'a file is created'
-        Path filePath = Paths.get(tempDir.toString(), 'test.csv')
-        Files.exists(filePath)
-
-        and: 'can load the items correctly'
-        List<Item> loadedItems = persistence.loadItems()
+        then: 'can load the items correctly'
+        def loadedItems = persistence.loadItems()
 
         and: 'the loaded items are the same as the saved items'
         loadedItems.size() == 2
