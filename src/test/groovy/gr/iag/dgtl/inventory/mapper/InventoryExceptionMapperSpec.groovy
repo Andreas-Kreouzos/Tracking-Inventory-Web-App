@@ -31,6 +31,6 @@ class InventoryExceptionMapperSpec extends Specification {
 
         then: 'the response is correctly populated'
         response.status == Response.Status.INTERNAL_SERVER_ERROR.statusCode
-        response.getEntity().errors.first()
+        response.getEntity().errors.size() > 0
     }
 }
