@@ -30,7 +30,7 @@ class ConstraintViolationExceptionMapperSpec extends Specification {
         then: 'a readable response'
         res.status == Response.Status.BAD_REQUEST.statusCode
         res.getEntity().errors.size() == 2
-        res.getEntity().errors[0] == 'blank must not be blank'
-        res.getEntity().errors[1] == 'id must not be null'
+        res.getEntity().errors.contains('blank must not be blank')
+        res.getEntity().errors.contains('id must not be null')
     }
 }
