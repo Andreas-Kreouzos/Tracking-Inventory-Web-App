@@ -34,7 +34,7 @@ class InventoryResourceSpec extends ResourceSpecification {
 
         then: 'the response is OK'
         1 * service.addItem(_)
-        response.status == Response.Status.OK.statusCode
+        response.status == Response.Status.CREATED.statusCode
 
         and: 'the response contains the item'
         def jsonResponse = new JsonSlurper().parseText(response.readEntity(String))
@@ -140,6 +140,9 @@ class InventoryResourceSpec extends ResourceSpecification {
     def 'Successful delete item request'() {
         given: 'a valid item'
         def item = TestItemProvider.createItem()
+
+        and: 'mocking the service get method with this item'
+        service.getItemBySerialNumber(item.serialNumber) >> item
 
         when: 'calling the delete method of the resource'
         def response = jerseyDelete(item.serialNumber, BASE_URL)
