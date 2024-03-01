@@ -95,3 +95,9 @@ build.dependsOn installLocalGitHook
 
 clean.dependsOn 'libertyStop'
 test.dependsOn 'war'
+
+task cleanBuildAfterTests(type: Delete) {
+    delete 'build'
+}
+
+test.finalizedBy 'cleanBuildAfterTests'
