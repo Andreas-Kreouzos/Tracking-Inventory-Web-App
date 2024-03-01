@@ -62,6 +62,8 @@ dependencies {
     testImplementation 'org.glassfish.jersey.ext:jersey-bean-validation:3.0.3'
     testImplementation 'org.glassfish.jersey.inject:jersey-hk2:3.0.3'
     testImplementation 'org.glassfish.jersey.media:jersey-media-json-jackson:3.0.3'
+    testImplementation 'org.testcontainers:testcontainers:1.19.6'
+    testImplementation 'org.testcontainers:spock:1.19.6'
 
     /* Logging */
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.2'
@@ -92,3 +94,4 @@ task installLocalGitHook(type: Copy) {
 build.dependsOn installLocalGitHook
 
 clean.dependsOn 'libertyStop'
+test.dependsOn 'war'
