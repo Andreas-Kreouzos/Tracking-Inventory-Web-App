@@ -1,6 +1,5 @@
 package integration.gr.iag.dgtl.inventory
 
-import gr.iag.dgtl.inventory.PropertyReader
 import gr.iag.dgtl.inventory.TestItemProvider
 import gr.iag.dgtl.inventory.dto.ErrorResponse
 import jakarta.json.bind.Jsonb
@@ -10,17 +9,35 @@ import jakarta.ws.rs.client.ClientBuilder
 import jakarta.ws.rs.client.Entity
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import spock.lang.Specification
+import org.testcontainers.spock.Testcontainers
+import spock.lang.Shared
+import util.TestContainersSpec
 
-class TrackingInventoryIntegrationSpec extends Specification {
+import java.net.http.HttpClient
 
-    private static final String SERVICE_URL =
-            "http://localhost:${PropertyReader.getProperty('app.port')}/tracking-inventory/inventory"
+@Testcontainers
+class TrackingInventoryIntegrationSpec extends TestContainersSpec {
 
+    @Shared
     Jsonb jsonb
+
+    @Shared
     def requestBody
 
-    def setup() {
+    @Shared
+    HttpClient client
+
+    @Shared
+    String appUrl
+
+    def setupSpec() {
+        openLiberty.start()
+        appUrl = "http://${openLiberty.getHost()}:${openLiberty.getMappedPort(9080)}/inventory"
+
+        final String allLogs = openLiberty.getLogs()
+        println("Container Logs: \n$allLogs")
+
+        client = HttpClient.newHttpClient()
         jsonb = JsonbBuilder.create()
         requestBody = TestItemProvider.generateRandomItem()
     }
@@ -79,25 +96,22 @@ class TrackingInventoryIntegrationSpec extends Specification {
     }
 
     def doPost(Object requestPayload) {
-
         Client client = ClientBuilder.newClient()
-        client.target(SERVICE_URL)
+        return client.target(appUrl)
                 .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(requestPayload))
     }
 
     def doGet() {
-
         Client client = ClientBuilder.newClient()
-        client.target(SERVICE_URL)
+        return client.target(appUrl)
                 .request(MediaType.APPLICATION_JSON)
                 .get()
     }
 
     def doDelete(String serialNumber) {
-
         Client client = ClientBuilder.newClient()
-        client.target(SERVICE_URL + '/' + serialNumber)
+        client.target(appUrl + '/' + serialNumber)
                 .request(MediaType.APPLICATION_JSON)
                 .delete()
     }
