@@ -19,7 +19,6 @@ class TestContainersSpec extends Specification {
     @Shared
     GenericContainer openLiberty = new GenericContainer(DockerImageName.parse("icr.io/appcafe/open-liberty:full-java17-openj9-ubi"))
             .withExposedPorts(9080, 9443)
-            .withEnv("REDIS_HOST", "redis")
             .withCopyFileToContainer(MountableFile.forHostPath("build/libs/tracking-inventory-0.0.1-SNAPSHOT.war"), "${CONTAINER_CONFIG_BASE_PATH}/apps/tracking-inventory-0.0.1-SNAPSHOT.war")
             .withCopyFileToContainer(MountableFile.forHostPath("${LIBERTY_CONFIG_BASE_PATH}/server.xml"), "${CONTAINER_CONFIG_BASE_PATH}/server.xml")
             .withCopyFileToContainer(MountableFile.forHostPath("${LIBERTY_CONFIG_BASE_PATH}/bootstrap.properties"), "${CONTAINER_CONFIG_BASE_PATH}/bootstrap.properties")
