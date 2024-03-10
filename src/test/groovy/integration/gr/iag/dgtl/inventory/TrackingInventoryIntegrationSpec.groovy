@@ -34,9 +34,6 @@ class TrackingInventoryIntegrationSpec extends TestContainersSpec {
         openLiberty.start()
         appUrl = "http://${openLiberty.getHost()}:${openLiberty.getMappedPort(9080)}/inventory"
 
-        final String allLogs = openLiberty.getLogs()
-        println("Container Logs: \n$allLogs")
-
         client = HttpClient.newHttpClient()
         jsonb = JsonbBuilder.create()
         requestBody = TestItemProvider.generateRandomItem()
